@@ -2,7 +2,7 @@
 <project default="jar">
 
   <target name="compile">
-    <javac srcdir="." />
+    <javac srcdir="." excludes="**/Tests/*"/>
   </target>
 
   <target name="jar" depends="compile">
