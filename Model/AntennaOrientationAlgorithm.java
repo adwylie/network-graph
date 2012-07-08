@@ -20,7 +20,7 @@ import Algorithms.Quicksort;
 
 public class AntennaOrientationAlgorithm {
     
-    private static boolean logging = true;
+    private static boolean logging = false;
     
     private KruskalMST<Node, Link> mst;
     
