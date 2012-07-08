@@ -35,7 +35,7 @@ import Model.WeightedGraph;
 
 public class NetworkGUI extends JPanel implements ActionListener {
 
-    private static boolean logging = true;
+    private static boolean logging = false;
     
     private static final long serialVersionUID = 1L;
     

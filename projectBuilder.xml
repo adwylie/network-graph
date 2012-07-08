@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<project default="jar">
+
+  <target name="compile">
+    <javac srcdir="." />
+  </target>
+
+  <target name="jar" depends="compile">
+    <jar destfile="NetGraph.jar"
+         basedir="."
+         includes="**/*.class">
+      <manifest>
+        <attribute name="Main-Class" value="UI.NetworkGUI" />
+      </manifest>
+    </jar>
+  </target>
+  	
+</project>
