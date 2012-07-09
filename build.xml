@@ -23,13 +23,16 @@
   </target>
 
   <target name="makedir">
-    <mkdir dir="${build.dir}/*"/>
+    <mkdir dir="${build.dir}"/>
     <mkdir dir="${docs.dir}"/>
   	<mkdir dir="${test.report.dir}"/>
   </target>
 
   <target name="compile" depends="clean, makedir">
-    <javac srcdir="${src.dir}" destdir="${build.dir}">
+    <javac
+  	  srcdir="${src.dir}"
+  	  destdir="${build.dir}"
+  	  excludes="**/Tests/**">
       <!-- <classpath refid="junit.class.path"/> -->
     </javac>
   </target>
