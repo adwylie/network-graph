@@ -8,13 +8,6 @@
   <property name="test.dir" location="src"/>
   <property name="test.report.dir" location="tests"/>
 
-  <!--
-  <path id="junit.class.path">
-    <pathelement location="lib/junit.jar"/>
-  	<pathelement location="${build.dir}"/>
-  </path>
-  -->
-
   <target name="clean">
   	<delete dir="${build.dir}/*"/>
     <delete dir="${docs.dir}"/>
@@ -30,6 +23,7 @@
 
   <target name="compile" depends="clean, makedir">
     <javac
+      includeantruntime="false"
   	  srcdir="${src.dir}"
   	  destdir="${build.dir}"
   	  excludes="**/Tests/**">
@@ -45,9 +39,10 @@
     <jar
       destfile="${dist.dir}/Network-Graph.jar"
       basedir="${build.dir}"
-      excludes="**/Tests/*">
+      excludes="**/Tests/**">
       <manifest>
         <attribute name="Main-Class" value="UI.NetworkGUI"/>
+      	<attribute name="Class-Path" value="."/>
       </manifest>
     </jar>
   </target>
