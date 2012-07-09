@@ -23,6 +23,7 @@
   </target>
 
   <target name="makedir">
+    <mkdir dir="${build.dir}/*"/>
     <mkdir dir="${docs.dir}"/>
   	<mkdir dir="${test.report.dir}"/>
   </target>
