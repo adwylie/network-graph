@@ -8,6 +8,18 @@
   <property name="test.dir" location="src"/>
   <property name="test.report.dir" location="tests"/>
 
+  <path id="build.classpath">
+    <fileset dir="${src.dir}">
+      <include name="*.jar"/>
+    </fileset>
+  </path>
+
+  <manifestclasspath
+    property="classpath"
+    jarfile="${dist.dir}/Network-Graph.jar">
+    <classpath refid="build.classpath"/>
+  </manifestclasspath>
+
   <target name="clean">
   	<delete dir="${build.dir}/*"/>
     <delete dir="${docs.dir}"/>
@@ -42,7 +54,7 @@
       excludes="**/Tests/**">
       <manifest>
         <attribute name="Main-Class" value="UI.NetworkGUI"/>
-      	<attribute name="Class-Path" value="."/>
+        <attribute name="Class-Path" value="${classpath}"/>
       </manifest>
     </jar>
   </target>
