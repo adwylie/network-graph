@@ -40,7 +40,7 @@
       basedir="${build.dir}"
       excludes="**/Tests/**">
       <manifest>
-        <attribute name="Main-Class" value="UI.NetworkGUI"/>
+        <attribute name="Main-Class" value="ui.NetworkGUI"/>
       </manifest>
     </jar>
   </target>
