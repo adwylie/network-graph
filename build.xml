@@ -8,18 +8,6 @@
   <property name="test.dir" location="src"/>
   <property name="test.report.dir" location="tests"/>
 
-  <path id="build.classpath">
-    <fileset dir="${src.dir}">
-      <include name="*.jar"/>
-    </fileset>
-  </path>
-
-  <manifestclasspath
-    property="classpath"
-    jarfile="${dist.dir}/Network-Graph.jar">
-    <classpath refid="build.classpath"/>
-  </manifestclasspath>
-
   <target name="clean">
   	<delete dir="${build.dir}/*"/>
     <delete dir="${docs.dir}"/>
@@ -39,7 +27,6 @@
   	  srcdir="${src.dir}"
   	  destdir="${build.dir}"
   	  excludes="**/Tests/**">
-      <!-- <classpath refid="junit.class.path"/> -->
     </javac>
   </target>
 
@@ -54,14 +41,12 @@
       excludes="**/Tests/**">
       <manifest>
         <attribute name="Main-Class" value="UI.NetworkGUI"/>
-        <attribute name="Class-Path" value="${classpath}"/>
       </manifest>
     </jar>
   </target>
 
   <target name="junit" depends="compile">
     <junit printsummary="on" fork="true" haltonfailure="yes">
-      <!-- <classpath refid="junit.class.path"/> -->
       <formatter type="xml"/>
     	<batchtest todir="${test.report.dir}">
     	  <fileset dir="${src.dir}"><include name="**/*Test*.java"/></fileset>
