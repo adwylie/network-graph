@@ -1,11 +1,12 @@
-package Model;
+package model;
 
 import java.awt.Color;
 import java.awt.Graphics;
 import java.util.HashSet;
 import java.util.Iterator;
 
-import UI.DrawableInterface;
+import ui.DrawableInterface;
+
 
 // TODO: something for directed graph??
 

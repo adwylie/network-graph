@@ -1,12 +1,13 @@
-package Algorithms;
+package algorithms;
 
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
 
-import Model.EdgeInterface;
-import Model.Graph;
-import Model.VertexInterface;
+import model.EdgeInterface;
+import model.Graph;
+import model.VertexInterface;
+
 
 //Algorithm from: Introduction to Algorithms, Third Edition; Cormen et al.
 //pg. 1109

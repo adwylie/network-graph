@@ -1,4 +1,4 @@
-package Model;
+package model;
 // The link class represents a communications link between two (vertices)
 // networked nodes in a plane.
 

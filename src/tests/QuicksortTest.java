@@ -1,15 +1,18 @@
-package Tests;
+package tests;
 
 import static org.junit.Assert.*;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import model.Link;
+import model.Node;
+import model.WeightedGraph;
+
 import org.junit.Test;
 
-import Algorithms.Quicksort;
-import Model.Link;
-import Model.Node;
-import Model.WeightedGraph;
+import algorithms.Quicksort;
+
 
 public class QuicksortTest {
 

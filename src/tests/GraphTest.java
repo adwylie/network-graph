@@ -1,14 +1,15 @@
-package Tests;
+package tests;
 import static org.junit.Assert.*;
 
 import java.util.HashSet;
 
+import model.Graph;
+import model.Link;
+import model.Node;
+
 import org.junit.Before;
 import org.junit.Test;
 
-import Model.Graph;
-import Model.Link;
-import Model.Node;
 
 public class GraphTest {
     

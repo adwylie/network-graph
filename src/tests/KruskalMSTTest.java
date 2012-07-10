@@ -1,15 +1,17 @@
-package Tests;
+package tests;
 import static org.junit.Assert.*;
 
 import java.util.HashSet;
 import java.util.Set;
 
+import model.Link;
+import model.Node;
+import model.WeightedGraph;
+
 import org.junit.Test;
 
-import Algorithms.KruskalMST;
-import Model.Link;
-import Model.Node;
-import Model.WeightedGraph;
+import algorithms.KruskalMST;
+
 
 
 public class KruskalMSTTest {

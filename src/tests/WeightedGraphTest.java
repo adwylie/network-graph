@@ -1,12 +1,13 @@
-package Tests;
+package tests;
 import static org.junit.Assert.*;
+
+import model.Link;
+import model.Node;
+import model.WeightedGraph;
 
 import org.junit.Before;
 import org.junit.Test;
 
-import Model.Link;
-import Model.Node;
-import Model.WeightedGraph;
 
 
 public class WeightedGraphTest {

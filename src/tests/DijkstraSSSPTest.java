@@ -1,20 +1,22 @@
-package Tests;
+package tests;
 import static org.junit.Assert.*;
 
 import java.util.ArrayList;
 import java.util.logging.Level;
 
+import logging.NetworkLogger;
+import model.AntennaOrientationAlgorithm;
+import model.Link;
+import model.Node;
+import model.Sensor;
+import model.WeightedGraph;
+
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
-import Algorithms.DijkstraSSSP;
-import Logging.NetworkLogger;
-import Model.AntennaOrientationAlgorithm;
-import Model.Link;
-import Model.Node;
-import Model.Sensor;
-import Model.WeightedGraph;
+import algorithms.DijkstraSSSP;
+
 
 
 public class DijkstraSSSPTest {

@@ -1,15 +1,17 @@
-package Tests;
+package tests;
 import static org.junit.Assert.*;
 
 import java.util.HashSet;
 import java.util.Set;
 
+import model.Graph;
+import model.Link;
+import model.Node;
+
 import org.junit.Test;
 
-import Algorithms.ApproxVertexCover;
-import Model.Graph;
-import Model.Link;
-import Model.Node;
+import algorithms.ApproxVertexCover;
+
 
 
 public class ApproxVertexCoverTest {

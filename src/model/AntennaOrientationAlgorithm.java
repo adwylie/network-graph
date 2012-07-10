@@ -1,4 +1,4 @@
-package Model;
+package model;
 
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -7,12 +7,15 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 
-import Logging.NetworkLogger;
-import UI.NetworkGUI;
+import ui.NetworkGUI;
 
-import Algorithms.DijkstraSSSP;
-import Algorithms.KruskalMST;
-import Algorithms.Quicksort;
+import logging.NetworkLogger;
+
+import algorithms.DijkstraSSSP;
+import algorithms.KruskalMST;
+import algorithms.Quicksort;
+
+
 
 // Calculates the relevant values for omnidirectional and directional antennas,
 // along with providing methods for changing between them.

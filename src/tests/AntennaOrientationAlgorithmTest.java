@@ -1,19 +1,20 @@
-package Tests;
+package tests;
 import static org.junit.Assert.*;
 
 import java.util.Iterator;
 import java.util.logging.Level;
 
+import logging.NetworkLogger;
+import model.AntennaOrientationAlgorithm;
+import model.Graph;
+import model.Link;
+import model.Node;
+import model.Sensor;
+import model.WeightedGraph;
+
 import org.junit.BeforeClass;
 import org.junit.Test;
 
-import Logging.NetworkLogger;
-import Model.AntennaOrientationAlgorithm;
-import Model.Graph;
-import Model.Link;
-import Model.Node;
-import Model.Sensor;
-import Model.WeightedGraph;
 
 
 public class AntennaOrientationAlgorithmTest {

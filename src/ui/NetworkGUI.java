@@ -1,4 +1,4 @@
-package UI;
+package ui;
 
 import java.awt.Color;
 import java.awt.Component;
@@ -26,12 +26,13 @@ import java.util.List;
 
 import javax.swing.*;
 
-import Logging.NetworkLogger;
-import Model.AntennaOrientationAlgorithm;
-import Model.Link;
-import Model.Node;
-import Model.Sensor;
-import Model.WeightedGraph;
+import logging.NetworkLogger;
+import model.AntennaOrientationAlgorithm;
+import model.Link;
+import model.Node;
+import model.Sensor;
+import model.WeightedGraph;
+
 
 public class NetworkGUI extends JPanel implements ActionListener {
 

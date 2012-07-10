@@ -1,4 +1,4 @@
-package Model;
+package model;
 import java.util.HashSet;
 import java.util.Hashtable;
 import java.util.Iterator;

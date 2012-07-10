@@ -1,10 +1,11 @@
-package Model;
+package model;
 
 import java.awt.Color;
 import java.awt.Font;
 import java.awt.Graphics;
 
-import UI.DrawableInterface;
+import ui.DrawableInterface;
+
 
 
 public class Node implements VertexInterface, DrawableInterface {

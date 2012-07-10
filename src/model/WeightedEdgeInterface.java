@@ -1,4 +1,4 @@
-package Model;
+package model;
 
 public interface WeightedEdgeInterface
         extends EdgeInterface, Comparable<WeightedEdgeInterface> {

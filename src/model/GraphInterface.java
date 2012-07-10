@@ -1,4 +1,4 @@
-package Model;
+package model;
 import java.util.Set;
 
 public interface GraphInterface<V extends VertexInterface, E extends EdgeInterface> {
