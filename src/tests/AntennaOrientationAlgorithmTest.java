@@ -4,7 +4,7 @@ import static org.junit.Assert.*;
 import java.util.Iterator;
 import java.util.logging.Level;
 
-import logging.NetworkLogger;
+import logging.FileLogger;
 import model.AntennaOrientationAlgorithm;
 import model.Graph;
 import model.Link;
@@ -32,7 +32,7 @@ public class AntennaOrientationAlgorithmTest {
     @BeforeClass
     public static void setUpClass() {
         //No logging for tests
-    	NetworkLogger.disableLogging();
+    	FileLogger.disableLogging();
     }
     
     @Test

@@ -27,7 +27,7 @@ import java.util.logging.Level;
 
 import javax.swing.*;
 
-import logging.NetworkLogger;
+import logging.FileLogger;
 import model.AntennaOrientationAlgorithm;
 import model.Link;
 import model.Node;
@@ -91,7 +91,7 @@ public class NetworkGUI extends JPanel implements ActionListener {
         catch (Exception e) {
             if (logging) {
 	            //LOGGING
-	            NetworkLogger.log(
+	            FileLogger.log(
 	            		Level.WARNING,
 	                    NetworkGUI.class.getName() +
 	                    ": initializeGUI; Error loading System Look & Feel.");
@@ -726,7 +726,7 @@ public class NetworkGUI extends JPanel implements ActionListener {
             
             if (logging) {
                 //LOGGING
-                NetworkLogger.log(
+                FileLogger.log(
                 		Level.SEVERE,
                         NetworkGUI.class.getName() +
                         ": parseGraph; Error reading file.");
@@ -737,7 +737,7 @@ public class NetworkGUI extends JPanel implements ActionListener {
         {
             if (logging) {
                 //LOGGING
-                NetworkLogger.log(
+                FileLogger.log(
                 		Level.WARNING,
                         NetworkGUI.class.getName() +
                         ": parseGraph; Empty file loaded.");
@@ -777,7 +777,7 @@ public class NetworkGUI extends JPanel implements ActionListener {
             {
                 if (logging) {
                     //LOGGING
-                    NetworkLogger.log(
+                    FileLogger.log(
                     		Level.WARNING,
                             NetworkGUI.class.getName() +
                             ": parseGraph; Error finding object, discarding" +
@@ -796,7 +796,7 @@ public class NetworkGUI extends JPanel implements ActionListener {
                 {
                     if (logging) {
                         //LOGGING
-                        NetworkLogger.log(
+                        FileLogger.log(
                         		Level.WARNING,
                                 NetworkGUI.class.getName() +
                                 ": parseGraph; Error adding node." +
@@ -808,7 +808,7 @@ public class NetworkGUI extends JPanel implements ActionListener {
                 
                 if (logging) {
                     //LOGGING
-                    NetworkLogger.log(
+                    FileLogger.log(
                     		Level.INFO,
                             NetworkGUI.class.getName() +
                             ": parseGraph; Added node(" +
@@ -829,7 +829,7 @@ public class NetworkGUI extends JPanel implements ActionListener {
                 {
                     if (logging) {
                     //LOGGING
-                        NetworkLogger.log(
+                        FileLogger.log(
                         		Level.WARNING,
                                 NetworkGUI.class.getName() +
                                 ": parseGraph; Error adding edge." +
@@ -846,7 +846,7 @@ public class NetworkGUI extends JPanel implements ActionListener {
                 if (from == null || to == null) {
                     if (logging) {
                         //LOGGING
-                        NetworkLogger.log(
+                        FileLogger.log(
                         		Level.WARNING,
                                 NetworkGUI.class.getName() +
                                 ": parseGraph; Error adding edge. Some or all" +
@@ -858,7 +858,7 @@ public class NetworkGUI extends JPanel implements ActionListener {
                 
                 if (logging) {
                     //LOGGING
-                    NetworkLogger.log(
+                    FileLogger.log(
                     		Level.INFO,
                             NetworkGUI.class.getName() +
                             ": parseGraph; Added edge(" +
@@ -872,7 +872,7 @@ public class NetworkGUI extends JPanel implements ActionListener {
         
         if (logging) {
             //LOGGING
-            NetworkLogger.log(
+            FileLogger.log(
             		Level.INFO,
                     NetworkGUI.class.getName() +
                     ": parseGraph; Parsing Completed. Network Loaded.");

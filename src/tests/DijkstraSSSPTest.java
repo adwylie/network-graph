@@ -4,7 +4,7 @@ import static org.junit.Assert.*;
 import java.util.ArrayList;
 import java.util.logging.Level;
 
-import logging.NetworkLogger;
+import logging.FileLogger;
 import model.AntennaOrientationAlgorithm;
 import model.Link;
 import model.Node;
@@ -23,7 +23,7 @@ public class DijkstraSSSPTest {
     
     @BeforeClass
     public static void setUpClass() {
-    	NetworkLogger.disableLogging();
+    	FileLogger.disableLogging();
     }
 
     @Before

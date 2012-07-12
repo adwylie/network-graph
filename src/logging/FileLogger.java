@@ -11,18 +11,19 @@ import java.util.logging.SimpleFormatter;
  * @version 1.0
  * @since 2011-09-10
  */
-public class NetworkLogger {
+public class FileLogger {
 
     private static FileHandler fileTxt;
     private final static SimpleFormatter formatterTxt = new SimpleFormatter();
-    
+
     private static Logger logger = null;
-    
+
     /**
      * Constructor, private as we'll use the singleton pattern.
      */
-    private NetworkLogger() {}
-    
+    private FileLogger() {
+    }
+
     /**
      * Set up the logger & assign it to write to a log file.
      * 
@@ -33,13 +34,13 @@ public class NetworkLogger {
         // Only allow setup to occur once, so log files can't be overwritten
         // while within a single execution of the program.
         if (logger == null) {
-        	setupLogger(Level.INFO);
-            fileTxt = new FileHandler("NetLog.txt");
+            setupLogger(Level.INFO);
+            fileTxt = new FileHandler("log.txt");
             fileTxt.setFormatter(formatterTxt);
             logger.addHandler(fileTxt);
         }
     }
-    
+
     /**
      * Set up our logger to be the global logger, along with setting its level.
      * 
@@ -49,33 +50,31 @@ public class NetworkLogger {
         logger = Logger.getLogger(Logger.GLOBAL_LOGGER_NAME);
         logger.setLevel(level);
     }
-    
+
     /**
-     * Log a message.
-     * 
-     * First initialize the logger if need be, then log the message at the
-     * given severity. If there is an error creating a log file to write to,
-     * the logger is disabled by setting its level to Level.OFF. 
+     * Log a message. First initialize the logger if need be, then log the
+     * message at the given severity. If there is an error creating a log file
+     * to write to, the logger is disabled by setting its level to Level.OFF.
      * 
      * @param level the level of logging to do. ie. Level.INFO, &c.
      * @param message the logged message.
      */
     static public void log(Level level, String message) {
-    	try {
-    		setup();    	
-    		logger.log(level, message);
-    	} catch (Exception e) {
-    		// If we can't create an output file for the info, then don't
-    		// bother even logging the info.
-    		logger.setLevel(Level.OFF);
-    	}
+        try {
+            setup();
+            logger.log(level, message);
+        } catch (Exception e) {
+            // If we can't create an output file for the info, then don't
+            // bother even logging the info.
+            logger.setLevel(Level.OFF);
+        }
     }
-    
+
     /**
      * Disable logging.
      */
     static public void disableLogging() {
-    	setupLogger(Level.OFF);
+        setupLogger(Level.OFF);
     }
-    
+
 }
