@@ -1,74 +1,73 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <project name="Network-Graph" default="main" basedir=".">
 
-  <property name="src.dir" location="src"/>
-  <property name="build.dir" location="bin"/>
-	
-  <property name="lib.dir" location="lib"/>
-  <property name="docs.dir" location="docs"/>
-  <property name="dist.dir" location="dist"/>
+	<property name="src.dir" location="src" />
+	<property name="build.dir" location="bin" />
 
-  <property name="test.report.dir" location="tests"/>
-	
-  <path id="class.path">
-    <fileset dir="${lib.dir}">
-      <include name="*.jar"/>
-    </fileset>
-    <pathelement location="${build.dir}"/>
-    <pathelement location="${java.class.path}"/>
-  </path>
+	<property name="lib.dir" location="lib" />
+	<property name="docs.dir" location="docs" />
+	<property name="dist.dir" location="dist" />
 
-  <target name="clean">
-  	<delete includeemptydirs="true">
-  	  <fileset dir="${build.dir}" includes="**/*"/>
-      <fileset dir="${docs.dir}" includes="**/*"/>
-      <fileset dir="${test.report.dir}" includes="**/*"/>
-      <fileset dir="${dist.dir}" includes="**/*.jar"/>
-  	  <fileset dir="." includes="*log*" casesensitive="no"/>
-  	</delete>
-  </target>
+	<property name="test.report.dir" location="tests" />
 
-  <target name="compile" depends="clean">
-    <javac
-      includeantruntime="false"
-  	  srcdir="${src.dir}"
-  	  destdir="${build.dir}">
-      <classpath refid="class.path"/>
-    </javac>
-  </target>
+	<path id="class.path">
+		<fileset dir="${lib.dir}">
+			<include name="*.jar" />
+		</fileset>
+		<pathelement location="${build.dir}" />
+		<pathelement location="${java.class.path}" />
+	</path>
 
-  <target name="junit" depends="compile">
-    <junit printsummary="on" fork="true" haltonfailure="yes">
-      <classpath refid="class.path"/>
-      <formatter type="xml"/>
-      <batchtest todir="${test.report.dir}">
-        <fileset dir="${src.dir}">
-    	  <include name="**/*Test*.java"/>
-          <exclude name="**/AllTests.java"/>
-    	</fileset>
-      </batchtest>
-    </junit>
-  </target>
+	<target name="clean">
+		<mkdir dir="${build.dir}" />
+		<mkdir dir="${docs.dir}" />
+		<mkdir dir="${test.report.dir}" />
+		<mkdir dir="${dist.dir}" />
+		<delete includeemptydirs="true">
+			<fileset dir="${build.dir}/" includes="**/*" />
+			<fileset dir="${docs.dir}/" includes="**/*" />
+			<fileset dir="${test.report.dir}/" includes="**/*" />
+			<fileset dir="${dist.dir}/" includes="**/*.jar" />
+			<fileset dir="." includes="*log*" casesensitive="no" />
+		</delete>
+	</target>
 
-  <target name="docs" depends="compile">
-    <javadoc sourcepath="${src.dir}" destdir="${docs.dir}">
-      <excludepackage name="tests"/>
-    </javadoc>
-  </target>
+	<target name="compile" depends="clean">
+		<javac includeantruntime="false" srcdir="${src.dir}" destdir="${build.dir}">
+			<classpath refid="class.path" />
+		</javac>
+	</target>
 
-  <target name="jar" depends="compile">
-    <jar
-      destfile="${dist.dir}/Network-Graph.jar"
-      basedir="${build.dir}"
-      excludes="**/tests/**">
-      <manifest>
-        <attribute name="Main-Class" value="ui.NetworkGUI"/>
-      </manifest>
-    </jar>
-  </target>
+	<target name="junit" depends="compile">
+		<junit printsummary="on" fork="true" haltonfailure="yes">
+			<classpath refid="class.path" />
+			<formatter type="xml" />
+			<batchtest todir="${test.report.dir}">
+				<fileset dir="${src.dir}">
+					<include name="**/*Test*.java" />
+					<exclude name="**/AllTests.java" />
+				</fileset>
+			</batchtest>
+		</junit>
+	</target>
 
-  <target name="all" depends="clean, compile, junit, docs, jar"/>
-  <target name="no-docs" depends="clean, compile, junit, jar"/>
-  <target name="main" depends="clean, compile, junit"/>
-	
+	<target name="docs" depends="compile">
+		<javadoc sourcepath="${src.dir}" destdir="${docs.dir}">
+			<excludepackage name="tests" />
+		</javadoc>
+	</target>
+
+	<target name="jar" depends="compile">
+		<jar destfile="${dist.dir}/Network-Graph.jar" basedir="${build.dir}"
+			excludes="**/tests/**">
+			<manifest>
+				<attribute name="Main-Class" value="ui.NetworkGUI" />
+			</manifest>
+		</jar>
+	</target>
+
+	<target name="all" depends="clean, compile, junit, docs, jar" />
+	<target name="no-docs" depends="clean, compile, junit, jar" />
+	<target name="main" depends="clean, compile, junit" />
+
 </project>
