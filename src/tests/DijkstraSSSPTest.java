@@ -23,11 +23,7 @@ public class DijkstraSSSPTest {
     
     @BeforeClass
     public static void setUpClass() {
-        try {
-            //No logging for tests
-            NetworkLogger.setup();
-            NetworkLogger.LOGGER.setLevel(Level.OFF);
-        } catch (Exception e) {}
+    	NetworkLogger.disableLogging();
     }
 
     @Before

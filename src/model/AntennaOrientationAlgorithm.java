@@ -6,6 +6,7 @@ import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
+import java.util.logging.Level;
 
 import ui.NetworkGUI;
 
@@ -15,15 +16,17 @@ import algorithms.DijkstraSSSP;
 import algorithms.KruskalMST;
 import algorithms.Quicksort;
 
-
-
 // Calculates the relevant values for omnidirectional and directional antennas,
 // along with providing methods for changing between them.
 // All Sensors have the same range.
 
 public class AntennaOrientationAlgorithm {
     
-    private static boolean logging = false;
+	// Set logging true if this is a compiled class, false if the class is
+	// in a jar file.
+    private static boolean logging =
+    		!AntennaOrientationAlgorithm.class.getProtectionDomain().
+    		getCodeSource().getLocation().toString().contains("jar");
     
     private KruskalMST<Node, Link> mst;
     
@@ -61,9 +64,9 @@ public class AntennaOrientationAlgorithm {
         
         if (logging) {
             //LOGGING
-            NetworkLogger.LOGGER.info(
-                    NetworkGUI.class.getName() +
-                    ": initializeNet(net, mst);");
+            NetworkLogger.log(
+            		Level.INFO,
+            		NetworkGUI.class.getName() + ": initializeNet(net, mst);");
         }
         
         // Map Nodes to their corresponding Sensor, so that we can properly
@@ -104,9 +107,9 @@ public class AntennaOrientationAlgorithm {
         
         if (logging) {
             //LOGGING
-            NetworkLogger.LOGGER.info(
-                    NetworkGUI.class.getName() +
-                    ": setupOmniNet();");
+            NetworkLogger.log(
+            		Level.INFO,
+                    NetworkGUI.class.getName() + ": setupOmniNet();");
         }
 
         this.omniNet = new WeightedGraph<Sensor, Link>();
@@ -137,7 +140,8 @@ public class AntennaOrientationAlgorithm {
         
         if (logging) {
             //LOGGING
-            NetworkLogger.LOGGER.info(
+            NetworkLogger.log(
+            		Level.INFO,
                     NetworkGUI.class.getName() +
                     ": setupOmniNet(" + sensorRange + ");");
         }
@@ -179,9 +183,9 @@ public class AntennaOrientationAlgorithm {
         
         if (logging) {
             //LOGGING
-            NetworkLogger.LOGGER.info(
-                    NetworkGUI.class.getName() +
-                    ": setupDirNet();");
+            NetworkLogger.log(
+            		Level.INFO,
+                    NetworkGUI.class.getName() + ": setupDirNet();");
         }
         
         this.dirNet = new WeightedGraph<Sensor, Link>();
@@ -212,7 +216,8 @@ public class AntennaOrientationAlgorithm {
         
         if (logging) {
             //LOGGING
-            NetworkLogger.LOGGER.info(
+            NetworkLogger.log(
+            		Level.INFO,
                     NetworkGUI.class.getName() +
                     ": setupDirNet(" + sensorRange + ");");
         }
@@ -399,7 +404,8 @@ public class AntennaOrientationAlgorithm {
         
         if (logging) {
             //LOGGING
-            NetworkLogger.LOGGER.info(
+            NetworkLogger.log(
+            		Level.INFO,
                     NetworkGUI.class.getName() +
                     ": updateOmniRange(" + newRange + ");");
         }
@@ -446,7 +452,8 @@ public class AntennaOrientationAlgorithm {
         
         if (logging) {
             //LOGGING
-            NetworkLogger.LOGGER.info(
+            NetworkLogger.log(
+            		Level.INFO,
                     NetworkGUI.class.getName() +
                     ": setupDirRange(" + newRange + ");");
         }
@@ -759,7 +766,8 @@ public class AntennaOrientationAlgorithm {
         
         if (logging) {
             //LOGGING
-            NetworkLogger.LOGGER.info(
+            NetworkLogger.log(
+            		Level.INFO,
                     NetworkGUI.class.getName() +
                     ": getOmniDiameterLength()/" + diameter + ";");
         }
@@ -774,7 +782,8 @@ public class AntennaOrientationAlgorithm {
         
         if (logging) {
             //LOGGING
-            NetworkLogger.LOGGER.info(
+            NetworkLogger.log(
+            		Level.INFO,
                     NetworkGUI.class.getName() +
                     ": getDirDiameterLength()/" + diameter + ";");
         }
@@ -789,7 +798,8 @@ public class AntennaOrientationAlgorithm {
         
         if (logging) {
             //LOGGING
-            NetworkLogger.LOGGER.info(
+            NetworkLogger.log(
+            		Level.INFO,
                     NetworkGUI.class.getName() +
                     ": getOmniDiameterLengthHops()/" + diameter + ";");
         }
@@ -804,7 +814,8 @@ public class AntennaOrientationAlgorithm {
         
         if (logging) {
             //LOGGING
-            NetworkLogger.LOGGER.info(
+            NetworkLogger.log(
+            		Level.INFO,
                     NetworkGUI.class.getName() +
                     ": getDirDiameterLengthHops()/" + diameter + ";");
         }
@@ -819,7 +830,8 @@ public class AntennaOrientationAlgorithm {
         
         if (logging) {
             //LOGGING
-            NetworkLogger.LOGGER.info(
+            NetworkLogger.log(
+            		Level.INFO,
                     NetworkGUI.class.getName() +
                     ": getOmniShortestRouteLength(" +
                     u + ", " + v + ")/" + srl + ";");
@@ -835,7 +847,8 @@ public class AntennaOrientationAlgorithm {
         
         if (logging) {
             //LOGGING
-            NetworkLogger.LOGGER.info(
+            NetworkLogger.log(
+            		Level.INFO,
                     NetworkGUI.class.getName() +
                     ": getDirShortestRouteLength(" +
                     u + ", " + v + ")/" + srl + ";");
@@ -851,7 +864,8 @@ public class AntennaOrientationAlgorithm {
         
         if (logging) {
             //LOGGING
-            NetworkLogger.LOGGER.info(
+            NetworkLogger.log(
+            		Level.INFO,
                     NetworkGUI.class.getName() +
                     ": getOmniShortestRouteLengthHops()/" + hops + ";");
         }
@@ -866,7 +880,8 @@ public class AntennaOrientationAlgorithm {
         
         if (logging) {
             //LOGGING
-            NetworkLogger.LOGGER.info(
+            NetworkLogger.log(
+            		Level.INFO,
                     NetworkGUI.class.getName() +
                     ": getDirShortestRouteLengthHops()/" + hops + ";");
         }
@@ -881,7 +896,8 @@ public class AntennaOrientationAlgorithm {
         
         if (logging) {
             //LOGGING
-            NetworkLogger.LOGGER.info(
+            NetworkLogger.log(
+            		Level.INFO,
                     NetworkGUI.class.getName() +
                     ": getOmniShortestRoute(" +
                     u + ", " + v + ")/" + sr.toString() + ";");
@@ -897,7 +913,8 @@ public class AntennaOrientationAlgorithm {
         
         if (logging) {
             //LOGGING
-            NetworkLogger.LOGGER.info(
+            NetworkLogger.log(
+            		Level.INFO,
                     NetworkGUI.class.getName() +
                     ": getDirShortestRoute(" +
                     u + ", " + v + ")/" + sr.toString() + ";");
@@ -913,7 +930,8 @@ public class AntennaOrientationAlgorithm {
         
         if (logging) {
             //LOGGING
-            NetworkLogger.LOGGER.info(
+            NetworkLogger.log(
+            		Level.INFO,
                     NetworkGUI.class.getName() +
                     ": getOmniAverageShortestRouteLength()/" + length + ";");
         }
@@ -928,7 +946,8 @@ public class AntennaOrientationAlgorithm {
         
         if (logging) {
             //LOGGING
-            NetworkLogger.LOGGER.info(
+            NetworkLogger.log(
+            		Level.INFO,
                     NetworkGUI.class.getName() +
                     ": getDirAverageShortestRouteLength()/" + length + ";");
         }
@@ -943,9 +962,11 @@ public class AntennaOrientationAlgorithm {
         
         if (logging) {
             //LOGGING
-            NetworkLogger.LOGGER.info(
+            NetworkLogger.log(
+            		Level.INFO,
                     NetworkGUI.class.getName() +
-                    ": getOmniAverageShortestRouteLengthHops()/" + length + ";");
+                    ": getOmniAverageShortestRouteLengthHops()/" +
+                    length + ";");
         }
         
         return length;
@@ -958,7 +979,8 @@ public class AntennaOrientationAlgorithm {
          
          if (logging) {
              //LOGGING
-             NetworkLogger.LOGGER.info(
+             NetworkLogger.log(
+             		Level.INFO,
                      NetworkGUI.class.getName() +
                      ": getDirAverageShortestRouteLengthHops()/" + length + ";");
          }

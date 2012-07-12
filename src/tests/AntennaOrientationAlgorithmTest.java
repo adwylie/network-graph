@@ -31,11 +31,8 @@ public class AntennaOrientationAlgorithmTest {
     
     @BeforeClass
     public static void setUpClass() {
-        try {
-            //No logging for tests
-            NetworkLogger.setup();
-            NetworkLogger.LOGGER.setLevel(Level.OFF);
-        } catch (Exception e) {}
+        //No logging for tests
+    	NetworkLogger.disableLogging();
     }
     
     @Test

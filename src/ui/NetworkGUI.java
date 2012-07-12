@@ -23,6 +23,7 @@ import java.util.Arrays;
 import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.List;
+import java.util.logging.Level;
 
 import javax.swing.*;
 
@@ -33,10 +34,13 @@ import model.Node;
 import model.Sensor;
 import model.WeightedGraph;
 
-
 public class NetworkGUI extends JPanel implements ActionListener {
 
-    private static boolean logging = false;
+	// Set logging true if this is a compiled class, false if the class is
+	// in a jar file.
+	private static boolean logging =
+			!NetworkGUI.class.getProtectionDomain().
+			getCodeSource().getLocation().toString().contains("jar");
     
     private static final long serialVersionUID = 1L;
     
@@ -71,11 +75,6 @@ public class NetworkGUI extends JPanel implements ActionListener {
         //creating and showing this application's GUI.
         SwingUtilities.invokeLater(new Runnable() {
             public void run() {
-                
-                if (logging) {
-                    try { NetworkLogger.setup(); } catch (Exception e) {}
-                }
-                
                 NetworkGUI.initializeGUI();
             }
         });
@@ -91,10 +90,11 @@ public class NetworkGUI extends JPanel implements ActionListener {
         } 
         catch (Exception e) {
             if (logging) {
-                //LOGGING
-                NetworkLogger.LOGGER.info(
-                        NetworkGUI.class.getName() +
-                        ": initializeGUI; Error loading System Look & Feel.");
+	            //LOGGING
+	            NetworkLogger.log(
+	            		Level.WARNING,
+	                    NetworkGUI.class.getName() +
+	                    ": initializeGUI; Error loading System Look & Feel.");
             }
         }
         
@@ -726,7 +726,8 @@ public class NetworkGUI extends JPanel implements ActionListener {
             
             if (logging) {
                 //LOGGING
-                NetworkLogger.LOGGER.info(
+                NetworkLogger.log(
+                		Level.SEVERE,
                         NetworkGUI.class.getName() +
                         ": parseGraph; Error reading file.");
             }
@@ -736,7 +737,8 @@ public class NetworkGUI extends JPanel implements ActionListener {
         {
             if (logging) {
                 //LOGGING
-                NetworkLogger.LOGGER.info(
+                NetworkLogger.log(
+                		Level.WARNING,
                         NetworkGUI.class.getName() +
                         ": parseGraph; Empty file loaded.");
             }
@@ -775,7 +777,8 @@ public class NetworkGUI extends JPanel implements ActionListener {
             {
                 if (logging) {
                     //LOGGING
-                    NetworkLogger.LOGGER.info(
+                    NetworkLogger.log(
+                    		Level.WARNING,
                             NetworkGUI.class.getName() +
                             ": parseGraph; Error finding object, discarding" +
                             " token and continuing parsing.");
@@ -793,7 +796,8 @@ public class NetworkGUI extends JPanel implements ActionListener {
                 {
                     if (logging) {
                         //LOGGING
-                        NetworkLogger.LOGGER.info(
+                        NetworkLogger.log(
+                        		Level.WARNING,
                                 NetworkGUI.class.getName() +
                                 ": parseGraph; Error adding node." +
                                 " No more tokens.");
@@ -804,7 +808,8 @@ public class NetworkGUI extends JPanel implements ActionListener {
                 
                 if (logging) {
                     //LOGGING
-                    NetworkLogger.LOGGER.info(
+                    NetworkLogger.log(
+                    		Level.INFO,
                             NetworkGUI.class.getName() +
                             ": parseGraph; Added node(" +
                             nodeName + ", "  + nodeX + ", " + nodeY + ").");
@@ -824,7 +829,8 @@ public class NetworkGUI extends JPanel implements ActionListener {
                 {
                     if (logging) {
                     //LOGGING
-                        NetworkLogger.LOGGER.info(
+                        NetworkLogger.log(
+                        		Level.WARNING,
                                 NetworkGUI.class.getName() +
                                 ": parseGraph; Error adding edge." +
                                 " No more tokens.");
@@ -840,7 +846,8 @@ public class NetworkGUI extends JPanel implements ActionListener {
                 if (from == null || to == null) {
                     if (logging) {
                         //LOGGING
-                        NetworkLogger.LOGGER.info(
+                        NetworkLogger.log(
+                        		Level.WARNING,
                                 NetworkGUI.class.getName() +
                                 ": parseGraph; Error adding edge. Some or all" +
                                 " of the nodes to connect do not exist.");
@@ -851,7 +858,8 @@ public class NetworkGUI extends JPanel implements ActionListener {
                 
                 if (logging) {
                     //LOGGING
-                    NetworkLogger.LOGGER.info(
+                    NetworkLogger.log(
+                    		Level.INFO,
                             NetworkGUI.class.getName() +
                             ": parseGraph; Added edge(" +
                             edgeFrom + ", "  + edgeTo + ").");
@@ -864,7 +872,8 @@ public class NetworkGUI extends JPanel implements ActionListener {
         
         if (logging) {
             //LOGGING
-            NetworkLogger.LOGGER.info(
+            NetworkLogger.log(
+            		Level.INFO,
                     NetworkGUI.class.getName() +
                     ": parseGraph; Parsing Completed. Network Loaded.");
         }
