@@ -9,6 +9,9 @@
 	<property name="dist.dir" location="dist" />
 
 	<property name="test.report.dir" location="tests" />
+	
+	<property name="name.jar" value="Network-Graph.jar" />
+	<property name="main.class" value="ui.NetworkGUI" />
 
 	<path id="class.path">
 		<fileset dir="${lib.dir}">
@@ -58,10 +61,10 @@
 	</target>
 
 	<target name="jar" depends="compile">
-		<jar destfile="${dist.dir}/Network-Graph.jar" basedir="${build.dir}"
+		<jar destfile="${dist.dir}/${name.jar}" basedir="${build.dir}"
 			excludes="**/tests/**">
 			<manifest>
-				<attribute name="Main-Class" value="ui.NetworkGUI" />
+				<attribute name="Main-Class" value="${main.class}" />
 			</manifest>
 		</jar>
 	</target>
