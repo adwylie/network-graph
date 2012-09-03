@@ -18,7 +18,6 @@
 			<include name="*.jar" />
 		</fileset>
 		<pathelement location="${build.dir}" />
-		<pathelement location="${java.class.path}" />
 	</path>
 
 	<target name="clean">
