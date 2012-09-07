@@ -1,7 +1,10 @@
 package model;
 
 public interface VertexInterface {
-    float getX();
-    float getY();
-    String getName();
+
+	float getX();
+
+	float getY();
+
+	String getName();
 }
