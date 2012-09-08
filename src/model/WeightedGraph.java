@@ -34,13 +34,13 @@ public class WeightedGraph<V extends VertexInterface, E extends WeightedEdgeInte
 		vertices.add(u);
 		vertices.add(v);
 
-		verticesMap.put(x, vertices);
+		edgesToVertices.put(x, vertices);
 
 		// Add to our dictionary. (edgesMap)
-		HashSet<E> vEdges = edgesMap.get(v);
+		HashSet<E> vEdges = verticesToEdges.get(v);
 		vEdges.add(x);
 
-		HashSet<E> uEdges = edgesMap.get(u);
+		HashSet<E> uEdges = verticesToEdges.get(u);
 		uEdges.add(x);
 
 		// Set the edge weight & name.
