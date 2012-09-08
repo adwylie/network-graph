@@ -1,23 +1,24 @@
 package model;
 
-import java.awt.Color;
-import java.awt.Graphics;
-import java.util.Iterator;
+import ui.Drawable;
 
-import ui.DrawableInterface;
-
+/**
+ * @author Andrew Wylie <andrew.dale.wylie@gmail.com>
+ * @version 1.0
+ * @since 2011-09-10
+ */
 public class WeightedGraph<V extends VertexInterface, E extends WeightedEdgeInterface>
-		extends Graph<V, E> implements DrawableInterface {
+		extends Graph<V, E> implements Drawable {
 
 	@Override
-	public E insertEdge(V v, V u, E x) {
+	public E insertEdge(V v, V u, E e) {
 
 		// Check that the edge doesn't exist, and that the vertices do exist.
-		if (edges.contains(x)) {
-			return x;
+		if (edges.contains(e)) {
+			return e;
 		}
 
-		E edge = super.insertEdge(v, u, x);
+		E edge = super.insertEdge(v, u, e);
 
 		// Weight is currently the Euclidean distance between the vertices which
 		// are connected by the edge.
@@ -28,41 +29,6 @@ public class WeightedGraph<V extends VertexInterface, E extends WeightedEdgeInte
 		edge.setWeight((float) length);
 
 		return edge;
-	}
-
-	// Drawing things
-	public void drawMe(Graphics g) {
-
-		Iterator<V> verticesIterator = this.vertices().iterator();
-
-		// Draw vertices.
-		while (verticesIterator.hasNext()) {
-			V v = verticesIterator.next();
-			// TODO: Can I make V implement this interface?
-			if (v instanceof DrawableInterface) {
-				((DrawableInterface) v).drawMe(g);
-			}
-		}
-
-		// Draw edges.
-		verticesIterator = this.vertices().iterator();
-
-		while (verticesIterator.hasNext()) {
-			V v = verticesIterator.next();
-			Iterator<E> e = this.incidentEdges(v).iterator();
-			while (e.hasNext()) {
-				V u = this.opposite(v, e.next());
-
-				// TODO: Can I make V implement this interface?
-				if (v instanceof DrawableInterface
-						&& u instanceof DrawableInterface) {
-					g.setColor(Color.BLACK);
-					g.drawLine((int) v.getX(), (int) v.getY(), (int) u.getX(),
-							(int) u.getY());
-				}
-			}
-		}
-
 	}
 
 }

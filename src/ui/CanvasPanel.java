@@ -19,12 +19,12 @@ class CanvasPanel extends JPanel {
     private static final long serialVersionUID = 1L;
     private AffineTransform canvasTransform;
     private AffineTransform originTransform;
-    private ArrayList<DrawableInterface> components;
+    private ArrayList<Drawable> components;
 
     public CanvasPanel() {
 
         this.setDoubleBuffered(true);
-        this.components = new ArrayList<DrawableInterface>();
+        this.components = new ArrayList<Drawable>();
         this.setBorder(BorderFactory.createCompoundBorder(
             BorderFactory.createTitledBorder("Network"),
             BorderFactory.createEmptyBorder(5, 5, 5, 5)));
@@ -45,7 +45,7 @@ class CanvasPanel extends JPanel {
         g2.setTransform(canvasTransform);
 
         for (int i = 0; i < components.size(); i++) {
-            components.get(i).drawMe(g2);
+            components.get(i).paint(g2);
         }
 
         g2.setTransform(originTransform);
@@ -59,7 +59,7 @@ class CanvasPanel extends JPanel {
         return originTransform;
     }
 
-    public void draw(DrawableInterface o) {
+    public void draw(Drawable o) {
         components.add(o);
     }
 

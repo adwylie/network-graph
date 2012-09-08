@@ -1,13 +1,22 @@
 package model;
 
+import java.awt.Color;
+import java.awt.Graphics;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
 
+import ui.Drawable;
+
+/**
+ * @author Andrew Wylie <andrew.dale.wylie@gmail.com>
+ * @version 1.0
+ * @since 2011-09-10
+ */
 public class Graph<V extends VertexInterface, E extends EdgeInterface>
-		implements GraphInterface<V, E> {
+		implements GraphInterface<V, E>, Drawable {
 
 	// Vertex/Edge maps to each other.
 	protected HashMap<E, HashSet<V>> edgesToVertices = new HashMap<E, HashSet<V>>();
@@ -29,11 +38,21 @@ public class Graph<V extends VertexInterface, E extends EdgeInterface>
 
 	@Override
 	public Set<E> incidentEdges(V vertex) {
+
+		if (vertex == null) {
+			return null;
+		}
+
 		return verticesToEdges.get(vertex);
 	}
 
 	@Override
 	public Set<V> endVertices(E edge) {
+
+		if (edge == null) {
+			return null;
+		}
+
 		return edgesToVertices.get(edge);
 	}
 
@@ -41,7 +60,8 @@ public class Graph<V extends VertexInterface, E extends EdgeInterface>
 	public V opposite(V vertex, E edge) {
 
 		// Check that both the edge and vertex are in our graph.
-		if (!vertices.contains(vertex) || !edges.contains(edge)) {
+		if (vertex == null || edge == null || !vertices.contains(vertex)
+				|| !edges.contains(edge)) {
 			return null;
 		}
 
@@ -52,9 +72,9 @@ public class Graph<V extends VertexInterface, E extends EdgeInterface>
 			// We know this was a valid search. Return the opposite vertex.
 			Iterator<V> iter = vertices.iterator();
 			while (iter.hasNext()) {
-				V temp = iter.next();
-				if (!temp.equals(vertex)) {
-					return temp;
+				V v = iter.next();
+				if (!v.equals(vertex)) {
+					return v;
 				}
 			}
 		}
@@ -66,7 +86,8 @@ public class Graph<V extends VertexInterface, E extends EdgeInterface>
 	public boolean areAdjacent(V v, V u) {
 
 		// Check that both vertices are in our graph.
-		if (!vertices.contains(v) || !vertices.contains(u)) {
+		if (v == null || u == null || !vertices.contains(v)
+				|| !vertices.contains(u)) {
 			return false;
 		}
 
@@ -90,6 +111,10 @@ public class Graph<V extends VertexInterface, E extends EdgeInterface>
 	@Override
 	public V insertVertex(V vertex) {
 
+		if (vertex == null) {
+			return null;
+		}
+
 		// Check the vertex doesn't already exist.
 		if (vertices.contains(vertex)) {
 			return vertex;
@@ -108,12 +133,17 @@ public class Graph<V extends VertexInterface, E extends EdgeInterface>
 	@Override
 	public E insertEdge(V v, V u, E edge) {
 
+		if (edge == null) {
+			return null;
+		}
+
 		// Check that the edge doesn't exist, and that the vertices do exist.
 		if (edges.contains(edge)) {
 			return edge;
 		}
 
-		if (!vertices.contains(v) || !vertices.contains(u)) {
+		if (v == null || u == null || !vertices.contains(v)
+				|| !vertices.contains(u)) {
 			// Error - inserting edge between non-existent vertices.
 			return null;
 		}
@@ -142,7 +172,7 @@ public class Graph<V extends VertexInterface, E extends EdgeInterface>
 	public V removeVertex(V vertex) {
 
 		// Housekeeping for generic hashset.
-		if (!vertices.remove(vertex)) {
+		if (vertex == null || !vertices.remove(vertex)) {
 			// Error - removal of non-existent vertex.
 			return null;
 		}
@@ -170,7 +200,7 @@ public class Graph<V extends VertexInterface, E extends EdgeInterface>
 	public E removeEdge(E edge) {
 
 		// Housekeeping for generic hashset.
-		if (!edges.remove(edge)) {
+		if (edge == null || !edges.remove(edge)) {
 			// Error - removal of non-existent edge.
 			return null;
 		}
@@ -195,6 +225,47 @@ public class Graph<V extends VertexInterface, E extends EdgeInterface>
 	public String toString() {
 		return "VerticesMap: " + edgesToVertices.toString() + "\nEdgesMap: "
 				+ verticesToEdges.toString();
+	}
+
+	@Override
+	public void paint(Graphics g) {
+
+		Iterator<V> verticesIterator = vertices().iterator();
+
+		// Draw the vertices of the graph.
+		while (verticesIterator.hasNext()) {
+
+			V vertex = verticesIterator.next();
+
+			if (vertex instanceof Drawable) {
+				((Drawable) vertex).paint(g);
+			}
+		}
+
+		// Draw the edges of the graph.
+		// For each edge get its vertices, and then draw a line between the
+		// vertices.
+		Iterator<E> edgesIterator = edges().iterator();
+
+		while (edgesIterator.hasNext()) {
+
+			E edge = edgesIterator.next();
+			Iterator<V> connectedVerticesIter = endVertices(edge).iterator();
+
+			// We know each edge connects exactly two vertices.
+			V v = connectedVerticesIter.next();
+			V u = connectedVerticesIter.next();
+
+			int vx = (int) v.getX();
+			int vy = (int) v.getY();
+			int ux = (int) u.getX();
+			int uy = (int) u.getY();
+
+			if (v instanceof Drawable && u instanceof Drawable) {
+				g.setColor(Color.BLACK);
+				g.drawLine(vx, vy, ux, uy);
+			}
+		}
 	}
 
 }

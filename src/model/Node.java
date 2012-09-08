@@ -4,9 +4,9 @@ import java.awt.Color;
 import java.awt.Font;
 import java.awt.Graphics;
 
-import ui.DrawableInterface;
+import ui.Drawable;
 
-public class Node implements VertexInterface, DrawableInterface {
+public class Node implements VertexInterface, Drawable {
 
 	protected String name;
 	protected float x;
@@ -37,7 +37,7 @@ public class Node implements VertexInterface, DrawableInterface {
 	// Drawing things.
 	private float radius = 6;
 
-	public void drawMe(Graphics g) {
+	public void paint(Graphics g) {
 		g.setColor(Color.BLACK);
 		g.fillOval((int) (this.getX() - this.radius),
 				(int) (this.getY() - this.radius), (int) (this.radius * 2),

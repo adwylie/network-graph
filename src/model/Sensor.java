@@ -3,9 +3,9 @@ package model;
 import java.awt.Color;
 import java.awt.Graphics;
 
-import ui.DrawableInterface;
+import ui.Drawable;
 
-public class Sensor extends Node implements DrawableInterface {
+public class Sensor extends Node implements Drawable {
 
 	// Properties of the Sensors antenna.
 	private AntennaType antennaType;
@@ -76,7 +76,7 @@ public class Sensor extends Node implements DrawableInterface {
 	private Color antennaColor = new Color(Color.BLUE.getRed(),
 			Color.BLUE.getGreen(), Color.BLUE.getBlue(), 55);
 
-	public void drawMe(Graphics g) {
+	public void paint(Graphics g) {
 		g.setColor(antennaColor);
 		// The coordinate system has origin in the top left instead of bottom
 		// left. So we have to flip/mirror the angles along the y-axis.
@@ -93,7 +93,7 @@ public class Sensor extends Node implements DrawableInterface {
 				// Arc angle.
 				(int) (this.antennaAngle));
 
-		super.drawMe(g);
+		super.paint(g);
 	}
 
 }
