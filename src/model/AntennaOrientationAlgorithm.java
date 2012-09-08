@@ -92,7 +92,7 @@ public class AntennaOrientationAlgorithm {
 			Sensor u = sensorMap.get(endNodes.next());
 			Sensor v = sensorMap.get(endNodes.next());
 
-			net.insertEdge(u, v, new Link());
+			net.insertEdge(u, v, new Link(u.getName() + v.getName()));
 		}
 	}
 
@@ -416,7 +416,8 @@ public class AntennaOrientationAlgorithm {
 
 				if (getDistance(u, v) <= newRange && v != u
 						&& !this.omniNet.areAdjacent(u, v)) {
-					this.omniNet.insertEdge(u, v, new Link());
+					omniNet.insertEdge(u, v,
+							new Link(u.getName() + v.getName()));
 				}
 			}
 		}
@@ -455,7 +456,8 @@ public class AntennaOrientationAlgorithm {
 				// We only add an edge if they are not already connected.
 				if (getDistance(u, v) <= newRange) {
 					if (v != u && !this.dirNet.areAdjacent(u, v)) {
-						this.dirNet.insertEdge(u, v, new Link());
+						dirNet.insertEdge(u, v,
+								new Link(u.getName() + v.getName()));
 					}
 				} else {
 					// If the distance is greater than the range the we remove

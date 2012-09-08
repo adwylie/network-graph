@@ -19,102 +19,102 @@ import algorithms.DijkstraSSSP;
 
 public class DijkstraSSSPTest {
 
-    @BeforeClass
-    public static void setUpClass() {
-        FileLogger.disableLogging();
-    }
+	@BeforeClass
+	public static void setUpClass() {
+		FileLogger.disableLogging();
+	}
 
-    @Before
-    public void setUp() throws Exception {
-    }
+	@Before
+	public void setUp() throws Exception {
+	}
 
-    Node a = new Node("A", 0f, 0f);
-    Node b = new Node("B", 0f, 4f);
-    Node c = new Node("C", 0f, 12f);
-    Node d = new Node("D", 3f, 8f);
+	Node a = new Node("A", 0f, 0f);
+	Node b = new Node("B", 0f, 4f);
+	Node c = new Node("C", 0f, 12f);
+	Node d = new Node("D", 3f, 8f);
 
-    @Test
-    public void simpleTest() {
-        // Create the underlying fully connected network.
-        WeightedGraph<Node, Link> pn = new WeightedGraph<Node, Link>();
+	@Test
+	public void simpleTest() {
+		// Create the underlying fully connected network.
+		WeightedGraph<Node, Link> pn = new WeightedGraph<Node, Link>();
 
-        pn.insertVertex(a);
-        pn.insertVertex(b);
+		pn.insertVertex(a);
+		pn.insertVertex(b);
 
-        pn.insertEdge(a, b, new Link());
+		pn.insertEdge(a, b, new Link(a.getName() + b.getName()));
 
-        // Run the orientation algorithm.
-        AntennaOrientationAlgorithm aoa = new AntennaOrientationAlgorithm(pn);
+		// Run the orientation algorithm.
+		AntennaOrientationAlgorithm aoa = new AntennaOrientationAlgorithm(pn);
 
-        WeightedGraph<Sensor, Link> dirNet = aoa.getDirNet();
+		WeightedGraph<Sensor, Link> dirNet = aoa.getDirNet();
 
-        // The graph only has one edge.
-        Link expectedE = dirNet.edges().iterator().next();
-        ArrayList<Sensor> expectedV = new ArrayList<Sensor>(dirNet.vertices());
+		// The graph only has one edge.
+		Link expectedE = dirNet.edges().iterator().next();
+		ArrayList<Sensor> expectedV = new ArrayList<Sensor>(dirNet.vertices());
 
-        DijkstraSSSP<Sensor, Link> sssp = new DijkstraSSSP<Sensor, Link>(
-            dirNet, expectedV.get(0));
-        sssp.generatePath(expectedV.get(0), expectedV.get(1));
+		DijkstraSSSP<Sensor, Link> sssp = new DijkstraSSSP<Sensor, Link>(
+				dirNet, expectedV.get(0));
+		sssp.generatePath(expectedV.get(0), expectedV.get(1));
 
-        assertEquals(expectedV, sssp.getPathVerts());
+		assertEquals(expectedV, sssp.getPathVerts());
 
-        assertEquals(1, sssp.getPathEdges().size());
-        assertEquals(expectedE, sssp.getPathEdges().get(0));
+		assertEquals(1, sssp.getPathEdges().size());
+		assertEquals(expectedE, sssp.getPathEdges().get(0));
 
-        assertEquals(4f, sssp.getPathLength(), 0f);
-    }
+		assertEquals(4f, sssp.getPathLength(), 0f);
+	}
 
-    @Test
-    public void harderTest() {
-        // Create the initial network.
-        WeightedGraph<Node, Link> pn = new WeightedGraph<Node, Link>();
+	@Test
+	public void harderTest() {
+		// Create the initial network.
+		WeightedGraph<Node, Link> pn = new WeightedGraph<Node, Link>();
 
-        pn.insertVertex(a);
-        pn.insertVertex(b);
-        pn.insertVertex(c);
-        pn.insertVertex(d);
+		pn.insertVertex(a);
+		pn.insertVertex(b);
+		pn.insertVertex(c);
+		pn.insertVertex(d);
 
-        Link AB = new Link();
-        Link AD = new Link();
-        Link BC = new Link();
-        Link BD = new Link();
+		Link AB = new Link(a.getName() + b.getName());
+		Link AD = new Link(a.getName() + d.getName());
+		Link BC = new Link(b.getName() + c.getName());
+		Link BD = new Link(b.getName() + d.getName());
 
-        pn.insertEdge(a, b, AB);
-        pn.insertEdge(a, d, AD);
-        pn.insertEdge(b, c, BC);
-        pn.insertEdge(b, d, BD);
+		pn.insertEdge(a, b, AB);
+		pn.insertEdge(a, d, AD);
+		pn.insertEdge(b, c, BC);
+		pn.insertEdge(b, d, BD);
 
-        // Compute shortest path for each node to vertex a.
-        DijkstraSSSP<Node, Link> sssp = new DijkstraSSSP<Node, Link>(pn, a);
+		// Compute shortest path for each node to vertex a.
+		DijkstraSSSP<Node, Link> sssp = new DijkstraSSSP<Node, Link>(pn, a);
 
-        // List for checking tests.
-        ArrayList<Link> path = new ArrayList<Link>();
+		// List for checking tests.
+		ArrayList<Link> path = new ArrayList<Link>();
 
-        // a -> d
-        sssp.generatePath(a, d);
+		// a -> d
+		sssp.generatePath(a, d);
 
-        path.add(AD);
-        assertEquals(path, sssp.getPathEdges());
-        assertEquals(8.5f, sssp.getPathLength(), 0.3f);
-        path.clear();
+		path.add(AD);
+		assertEquals(path, sssp.getPathEdges());
+		assertEquals(8.5f, sssp.getPathLength(), 0.3f);
+		path.clear();
 
-        // a -> c
-        sssp.generatePath(a, c);
+		// a -> c
+		sssp.generatePath(a, c);
 
-        path.add(AB);
-        path.add(BC);
-        assertEquals(path, sssp.getPathEdges());
-        assertEquals(12f, sssp.getPathLength(), 0f);
-        path.clear();
+		path.add(AB);
+		path.add(BC);
+		assertEquals(path, sssp.getPathEdges());
+		assertEquals(12f, sssp.getPathLength(), 0f);
+		path.clear();
 
-        // a -> b
-        sssp.generatePath(a, b);
+		// a -> b
+		sssp.generatePath(a, b);
 
-        path.add(AB);
-        assertEquals(path, sssp.getPathEdges());
-        assertEquals(4f, sssp.getPathLength(), 0f);
-        path.clear();
+		path.add(AB);
+		assertEquals(path, sssp.getPathEdges());
+		assertEquals(4f, sssp.getPathLength(), 0f);
+		path.clear();
 
-    }
+	}
 
 }

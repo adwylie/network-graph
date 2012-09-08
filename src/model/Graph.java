@@ -162,9 +162,6 @@ public class Graph<V extends VertexInterface, E extends EdgeInterface>
 		verticesToEdges.get(v).add(edge);
 		verticesToEdges.get(u).add(edge);
 
-		// Set the edge name.
-		edge.setName(v.getName() + u.getName());
-
 		return edge;
 	}
 

@@ -1,42 +1,72 @@
 package model;
 
-// The link class represents a communications link between two (vertices)
-// networked nodes in a plane.
-
+/**
+ * The link class represents a communications link between two networked nodes
+ * (vertices) in a plane.
+ * 
+ * @author Andrew Wylie <andrew.dale.wylie@gmail.com>
+ * @version 1.0
+ * @since 2011-09-10
+ */
 public class Link implements WeightedEdgeInterface {
 
-	private String name = "";
+	private String name = null;
 	private float weight = 0f;
 
-	public int compareTo(WeightedEdgeInterface o) {
-		// Round away from zero to keep correct ordering.
-		if ((this.getWeight() - o.getWeight()) > 0f) {
-			return 1;
-		} else if ((this.getWeight() - o.getWeight()) < 0f) {
-			return -1;
-		} else {
-			return 0;
-		}
+	/**
+	 * Basic constructor for a Link object.
+	 * 
+	 * @param name
+	 *            the name of the Link.
+	 */
+	public Link(String name) {
+
+		this.name = name;
 	}
 
+	/**
+	 * Constructor for a Link object.
+	 * 
+	 * @param name
+	 *            the name of the link.
+	 * @param weight
+	 *            the weight of the link.
+	 */
+	public Link(String name, float weight) {
+
+		this(name);
+		this.weight = weight;
+	}
+
+	@Override
+	public int compareTo(WeightedEdgeInterface o) {
+
+		return (int) (getWeight() - o.getWeight());
+	}
+
+	@Override
 	public float getWeight() {
 		return weight;
 	}
 
+	@Override
 	public void setWeight(float weight) {
 		this.weight = weight;
 	}
 
+	@Override
 	public String getName() {
 		return name;
 	}
 
+	@Override
 	public void setName(String name) {
 		this.name = name;
 	}
 
+	@Override
 	public String toString() {
-		return this.name;
+		return name;
 	}
 
 }
