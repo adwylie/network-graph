@@ -35,10 +35,11 @@ import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
 
 import logging.FileLogger;
-import model.AntennaOrientor;
+import model.DirectionalNetwork;
 import model.GraphParser;
 import model.Link;
 import model.Node;
+import model.OmnidirectionalNetwork;
 import model.Sensor;
 import model.WeightedGraph;
 
@@ -79,7 +80,8 @@ public class NetworkGUI extends JPanel implements ActionListener {
 
 	// Class members.
 	private JCanvas canvas;
-	private AntennaOrientor aoa;
+	private DirectionalNetwork dirNet = null;
+	private OmnidirectionalNetwork omniNet = null;
 	private String selectedNetwork = "";
 
 	public static void main(String[] args) {
@@ -490,15 +492,16 @@ public class NetworkGUI extends JPanel implements ActionListener {
 
 				// Run the orientation algorithm.
 				if (pn != null) {
-					this.aoa = new AntennaOrientor(pn);
+					dirNet = new DirectionalNetwork(pn);
+					omniNet = new OmnidirectionalNetwork(pn);
 					JOptionPane.showMessageDialog(this.getRootPane(),
 							"Network loaded!");
 
 					// Draw the network on load if there is one selected.
-					if ("directional".equals(this.selectedNetwork)) {
-						this.drawGraph(this.aoa.getDirNet());
-					} else if ("omnidirectional".equals(this.selectedNetwork)) {
-						this.drawGraph(this.aoa.getOmniNet());
+					if ("directional".equals(selectedNetwork)) {
+						drawGraph(dirNet.getLogicalNetwork());
+					} else if ("omnidirectional".equals(selectedNetwork)) {
+						drawGraph(omniNet.getLogicalNetwork());
 					}
 				}
 			}
@@ -506,22 +509,22 @@ public class NetworkGUI extends JPanel implements ActionListener {
 
 		// Draw a graph on the drawing action commands.
 		if ("drawDir".equals(e.getActionCommand())) {
-			if (this.aoa != null) {
-				this.drawGraph(this.aoa.getDirNet());
+			if (dirNet != null) {
+				drawGraph(dirNet.getLogicalNetwork());
 			}
 			// Keep track of which network is visible.
-			this.selectedNetwork = "directional";
+			selectedNetwork = "directional";
 
 		} else if ("drawOmni".equals(e.getActionCommand())) {
-			if (this.aoa != null) {
-				this.drawGraph(this.aoa.getOmniNet());
+			if (omniNet != null) {
+				drawGraph(omniNet.getLogicalNetwork());
 			}
-			this.selectedNetwork = "omnidirectional";
+			selectedNetwork = "omnidirectional";
 		}
 
 		// Make sure that a graph is loaded before any actual commands are
 		// available.
-		if (this.aoa == null) {
+		if (dirNet == null || omniNet == null) {
 			JOptionPane.showMessageDialog(this.getRootPane(),
 					"You must load a network graph before analyzing it.");
 			return;
@@ -554,19 +557,22 @@ public class NetworkGUI extends JPanel implements ActionListener {
 
 				// Get the route length.
 				if ("directional".equals(this.selectedNetwork)) {
-					sPathLenHops = aoa.getDirShortestRouteLengthHops(fromText,
+
+					sPathLenHops = dirNet.getShortestPathLengthHops(fromText,
 							toText);
-					sPathLen = aoa.getDirShortestRouteLength(fromText, toText);
-					sPath = aoa.getDirShortestRoute(fromText, toText);
+					sPathLen = dirNet.getShortestPathLength(fromText, toText);
+					sPath = dirNet.getShortestPath(fromText, toText);
+
 				} else if ("omnidirectional".equals(this.selectedNetwork)) {
-					sPathLenHops = aoa.getOmniShortestRouteLengthHops(fromText,
+
+					sPathLenHops = omniNet.getShortestPathLengthHops(fromText,
 							toText);
-					sPathLen = aoa.getOmniShortestRouteLength(fromText, toText);
-					sPath = aoa.getOmniShortestRoute(fromText, toText);
+					sPathLen = omniNet.getShortestPathLength(fromText, toText);
+					sPath = omniNet.getShortestPath(fromText, toText);
 				}
 
-				this.pathLengthTextField.setText(numFormatter.format(sPathLen));
-				this.pathLengthHopsTextField.setText(numFormatter
+				pathLengthTextField.setText(numFormatter.format(sPathLen));
+				pathLengthHopsTextField.setText(numFormatter
 						.format(sPathLenHops));
 
 				// Get and draw the route itself.
@@ -623,9 +629,9 @@ public class NetworkGUI extends JPanel implements ActionListener {
 				float newRange = Float.parseFloat(newRangeText);
 
 				if ("directional".equals(this.selectedNetwork)) {
-					this.aoa.updateDirRange(newRange);
+					dirNet.updateDirRange(newRange);
 				} else if ("omnidirectional".equals(this.selectedNetwork)) {
-					this.aoa.updateOmniRange(newRange);
+					omniNet.updateOmniRange(newRange);
 				}
 
 				// Repaint to reflect the changes made to the model.
@@ -642,12 +648,12 @@ public class NetworkGUI extends JPanel implements ActionListener {
 
 			this.rangeUpdateTextField.setText("");
 
-			if ("directional".equals(this.selectedNetwork)) {
-				this.aoa.setupDirNet();
-				this.drawGraph(this.aoa.getDirNet());
-			} else if ("omnidirectional".equals(this.selectedNetwork)) {
-				this.aoa.setupOmniNet();
-				this.drawGraph(this.aoa.getOmniNet());
+			if ("directional".equals(selectedNetwork)) {
+				dirNet.setupLogicalNetwork();
+				drawGraph(dirNet.getLogicalNetwork());
+			} else if ("omnidirectional".equals(selectedNetwork)) {
+				omniNet.setupLogicalNetwork();
+				drawGraph(omniNet.getLogicalNetwork());
 			}
 
 			// Repaint to reflect the changes made to the model.
@@ -657,54 +663,53 @@ public class NetworkGUI extends JPanel implements ActionListener {
 		// On any event we want to...
 		if ("directional".equals(this.selectedNetwork)) {
 			// Update the normal graph statistics.
-			this.averageAngleTextField.setText(numFormatter.format(aoa
-					.getDirAverageAngle()));
-			this.averageRangeTextField.setText(numFormatter.format(aoa
-					.getDirAverageRange()));
-			this.totalEnergyUseTextField.setText(numFormatter.format(aoa
-					.getDirTotalEnergyUse() / 1000));
+			averageAngleTextField.setText(numFormatter.format(dirNet
+					.getAverageAngle()));
+			averageRangeTextField.setText(numFormatter.format(dirNet
+					.getAverageRange()));
+			totalEnergyUseTextField.setText(numFormatter.format(dirNet
+					.getTotalEnergyUse() / 1000));
 
 			// Update the average shortest path values.
-			this.averageSPLTextField.setText(numFormatter.format(this.aoa
-					.getDirAverageShortestRouteLength()));
-			this.averageSPLHopsTextField.setText(numFormatter.format(this.aoa
-					.getDirAverageShortestRouteLengthHops()));
+			averageSPLTextField.setText(numFormatter.format(dirNet
+					.getAverageShortestPathLength()));
+			averageSPLHopsTextField.setText(numFormatter.format(dirNet
+					.getAverageShortestPathLengthHops()));
 
 			// Update the graph diameter.
-			this.graphDiameterTextField.setText(numFormatter.format(this.aoa
-					.getDirDiameterLength()));
-			this.graphDiameterHopsTextField.setText(numFormatter
-					.format(this.aoa.getDirDiameterLengthHops()));
+			graphDiameterTextField.setText(numFormatter.format(dirNet
+					.getDiameter()));
+			graphDiameterHopsTextField.setText(numFormatter.format(dirNet
+					.getDiameterHops()));
 
 		} else if ("omnidirectional".equals(this.selectedNetwork)) {
 			// Update the normal graph statistics.
-			this.averageAngleTextField.setText(numFormatter.format(aoa
-					.getOmniAverageAngle()));
-			this.averageRangeTextField.setText(numFormatter.format(aoa
-					.getOmniAverageRange()));
-			this.totalEnergyUseTextField.setText(numFormatter.format(aoa
-					.getOmniTotalEnergyUse() / 1000));
+			averageAngleTextField.setText(numFormatter.format(omniNet
+					.getAverageAngle()));
+			averageRangeTextField.setText(numFormatter.format(omniNet
+					.getAverageRange()));
+			totalEnergyUseTextField.setText(numFormatter.format(omniNet
+					.getTotalEnergyUse() / 1000));
 
 			// Update the average shortest path values.
-			this.averageSPLTextField.setText(numFormatter.format(this.aoa
-					.getOmniAverageShortestRouteLength()));
-			this.averageSPLHopsTextField.setText(numFormatter.format(this.aoa
-					.getOmniAverageShortestRouteLengthHops()));
+			averageSPLTextField.setText(numFormatter.format(omniNet
+					.getAverageShortestPathLength()));
+			averageSPLHopsTextField.setText(numFormatter.format(omniNet
+					.getAverageShortestPathLengthHops()));
 
 			// Update the graph diameter.
-			this.graphDiameterTextField.setText(numFormatter.format(this.aoa
-					.getOmniDiameterLength()));
-			this.graphDiameterHopsTextField.setText(numFormatter
-					.format(this.aoa.getOmniDiameterLengthHops()));
+			graphDiameterTextField.setText(numFormatter.format(omniNet
+					.getDiameter()));
+			graphDiameterHopsTextField.setText(numFormatter.format(omniNet
+					.getDiameterHops()));
 		}
 
 	}
 
 	// Redraw the input graph.
 	private void drawGraph(WeightedGraph<Sensor, Link> g) {
-		this.canvas.clear();
-		this.canvas.add(g);
-		this.repaint();
+		canvas.clear();
+		canvas.add(g);
 	}
 
 	// This function loads a physical network from a file. It handles the

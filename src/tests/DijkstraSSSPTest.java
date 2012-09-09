@@ -5,7 +5,7 @@ import static org.junit.Assert.assertEquals;
 import java.util.ArrayList;
 
 import logging.FileLogger;
-import model.AntennaOrientor;
+import model.DirectionalNetwork;
 import model.Link;
 import model.Node;
 import model.Sensor;
@@ -44,16 +44,18 @@ public class DijkstraSSSPTest {
 		pn.insertEdge(a, b, new Link(a.getName() + b.getName()));
 
 		// Run the orientation algorithm.
-		AntennaOrientor aoa = new AntennaOrientor(pn);
+		DirectionalNetwork dirNet = new DirectionalNetwork(pn);
 
-		WeightedGraph<Sensor, Link> dirNet = aoa.getDirNet();
+		WeightedGraph<Sensor, Link> logicalNetwork;
+		logicalNetwork = dirNet.getLogicalNetwork();
 
 		// The graph only has one edge.
-		Link expectedE = dirNet.edges().iterator().next();
-		ArrayList<Sensor> expectedV = new ArrayList<Sensor>(dirNet.vertices());
+		Link expectedE = logicalNetwork.edges().iterator().next();
+		ArrayList<Sensor> expectedV;
+		expectedV = new ArrayList<Sensor>(logicalNetwork.vertices());
 
-		DijkstraSSSP<Sensor, Link> sssp = new DijkstraSSSP<Sensor, Link>(
-				dirNet, expectedV.get(0));
+		DijkstraSSSP<Sensor, Link> sssp;
+		sssp = new DijkstraSSSP<Sensor, Link>(logicalNetwork, expectedV.get(0));
 		sssp.generatePath(expectedV.get(0), expectedV.get(1));
 
 		assertEquals(expectedV, sssp.getPathVerts());
