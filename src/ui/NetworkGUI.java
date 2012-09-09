@@ -12,6 +12,7 @@ import java.awt.GridLayout;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.geom.AffineTransform;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
@@ -83,7 +84,7 @@ public class NetworkGUI extends JPanel implements ActionListener {
 	private JTextField totalEnergyUseTextField;
 
 	// Class members.
-	private CanvasPanel canvas;
+	private JCanvas canvas;
 	private AntennaOrientationAlgorithm aoa;
 	private String selectedNetwork = "";
 
@@ -139,8 +140,13 @@ public class NetworkGUI extends JPanel implements ActionListener {
 		optionList.setAlignmentY(Component.TOP_ALIGNMENT);
 
 		// Create the canvas panel. The networks will be drawn on it.
-		canvas = new CanvasPanel();
+		canvas = new JCanvas();
+		canvas.setPreferredSize(new Dimension(600, 600));
+		canvas.setTransform(AffineTransform.getTranslateInstance(300, 300));
 		canvas.setAlignmentY(Component.TOP_ALIGNMENT);
+		canvas.setBorder(BorderFactory.createCompoundBorder(
+				BorderFactory.createTitledBorder("Network"),
+				BorderFactory.createEmptyBorder(5, 5, 5, 5)));
 
 		// /////////////////////////////////////////////////////////////////////
 		// ///////////// Draw Network Control Group ////////////////////
@@ -703,7 +709,7 @@ public class NetworkGUI extends JPanel implements ActionListener {
 	// Redraw the input graph.
 	private void drawGraph(WeightedGraph<Sensor, Link> g) {
 		this.canvas.clear();
-		this.canvas.draw(g);
+		this.canvas.add(g);
 		this.repaint();
 	}
 
