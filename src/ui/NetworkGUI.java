@@ -710,7 +710,8 @@ public class NetworkGUI extends JPanel implements ActionListener {
 	// This function loads a physical network from a file. It handles the
 	// tokenization, parsing, and object creation.
 	private WeightedGraph<Node, Link> parseGraph(File file) {
-		return GraphParser.parse(file);
+		GraphParser graphParser = new GraphParser();
+		return graphParser.parse(file);
 	}
 
 }

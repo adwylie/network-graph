@@ -2,16 +2,13 @@ package model;
 
 import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.List;
-import java.util.logging.Level;
-
-import logging.FileLogger;
-import ui.NetworkGUI;
 
 /**
  * @author Andrew Wylie <andrew.dale.wylie@gmail.com>
@@ -20,59 +17,28 @@ import ui.NetworkGUI;
  */
 public class GraphParser {
 
-	// Set logging true if this is a compiled class, false if the class is
-	// in a jar file.
-	private static boolean logging = !NetworkGUI.class.getProtectionDomain()
-			.getCodeSource().getLocation().toString().contains("jar");
+	private String fileText = null;
 
-	public static WeightedGraph<Node, Link> parse(File file) {
+	public WeightedGraph<Node, Link> parse(File file) {
 		// Tokens
 		String NODE = "NODE";
 		String EDGE = "EDGE";
 
-		String OPEN_PARENTH = "(";
-		String CLOSE_PARENTH = ")";
-		String COMMA = ",";
+		String OPEN_PARENTH = "\\(";
+		String CLOSE_PARENTH = "\\)";
+		String COMMA = "\\,";
 		String WHITESPACE = "\\s";
 
-		// Read the file.
-		String fileText = "";
-		BufferedReader reader = null;
-
-		try {
-			reader = new BufferedReader(new FileReader(file));
-
-			String line = null;
-			while ((line = reader.readLine()) != null) {
-				fileText = fileText.concat(line).concat("\n");
-			}
-
-		} catch (IOException e) {
-
-			if (logging) {
-				// LOGGING
-				FileLogger.log(Level.SEVERE, NetworkGUI.class.getName()
-						+ ": parseGraph; Error reading file.");
-			}
-		}
-
-		if (fileText.equals("")) {
-			if (logging) {
-				// LOGGING
-				FileLogger.log(Level.WARNING, NetworkGUI.class.getName()
-						+ ": parseGraph; Empty file loaded.");
-			}
-
-			return null;
-		}
+		readFile(file);
 
 		// Tokenize the file content.
-		String[] tokens = fileText.split("(" + WHITESPACE + "+|\\" + COMMA
-				+ "|\\" + OPEN_PARENTH + "|\\" + CLOSE_PARENTH + ")+");
+		String[] tokens = fileText.split("(" + WHITESPACE + "+|" + COMMA + "|"
+				+ OPEN_PARENTH + "|" + CLOSE_PARENTH + ")+");
 
 		// Parse & Create the representation.
 		WeightedGraph<Node, Link> pn = new WeightedGraph<Node, Link>();
 		Hashtable<String, Node> nodes = new Hashtable<String, Node>();
+
 		List<String> tokensList = Arrays.asList(tokens);
 		Iterator<String> tokensIter = tokensList.iterator();
 
@@ -89,13 +55,6 @@ public class GraphParser {
 			// We will have either a node or an edge.
 			// If not throw away tokens until we are back in our grammar.
 			if (!currentObj.equals(NODE) && !currentObj.equals(EDGE)) {
-				if (logging) {
-					// LOGGING
-					FileLogger.log(Level.WARNING, NetworkGUI.class.getName()
-							+ ": parseGraph; Error finding object, discarding"
-							+ " token and continuing parsing.");
-				}
-
 				continue;
 			}
 
@@ -111,22 +70,7 @@ public class GraphParser {
 				if (tokensIter.hasNext()) {
 					nodeY = tokensIter.next();
 				} else {
-					if (logging) {
-						// LOGGING
-						FileLogger.log(Level.WARNING,
-								NetworkGUI.class.getName()
-										+ ": parseGraph; Error adding node."
-										+ " No more tokens.");
-					}
-
 					continue;
-				}
-
-				if (logging) {
-					// LOGGING
-					FileLogger.log(Level.INFO, NetworkGUI.class.getName()
-							+ ": parseGraph; Added node(" + nodeName + ", "
-							+ nodeX + ", " + nodeY + ").");
 				}
 
 				Node n = new Node(nodeName, Float.parseFloat(nodeX),
@@ -144,14 +88,6 @@ public class GraphParser {
 				if (tokensIter.hasNext()) {
 					edgeTo = tokensIter.next();
 				} else {
-					if (logging) {
-						// LOGGING
-						FileLogger.log(Level.WARNING,
-								NetworkGUI.class.getName()
-										+ ": parseGraph; Error adding edge."
-										+ " No more tokens.");
-					}
-
 					continue;
 				}
 
@@ -160,43 +96,37 @@ public class GraphParser {
 
 				// Trying to add an edge to node(s) which don't exist.
 				if (from == null || to == null) {
-					if (logging) {
-						// LOGGING
-						FileLogger
-								.log(Level.WARNING,
-										NetworkGUI.class.getName()
-												+ ": parseGraph; Error adding edge. Some or all"
-												+ " of the nodes to connect do not exist.");
-					}
-
 					continue;
-				}
-
-				if (logging) {
-					// LOGGING
-					FileLogger.log(Level.INFO, NetworkGUI.class.getName()
-							+ ": parseGraph; Added edge(" + edgeFrom + ", "
-							+ edgeTo + ").");
 				}
 
 				pn.insertEdge(from, to, new Link(from.getName() + to.getName()));
 			}
-
-		}
-
-		try {
-			reader.close();
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-
-		if (logging) {
-			// LOGGING
-			FileLogger.log(Level.INFO, NetworkGUI.class.getName()
-					+ ": parseGraph; Parsing Completed. Network Loaded.");
 		}
 
 		return pn;
 	}
+
+	private void readFile(File file) {
+
+		String text = "";
+
+		try {
+			BufferedReader reader = new BufferedReader(new FileReader(file));
+			String line = null;
+
+			while ((line = reader.readLine()) != null) {
+				text = text.concat(line).concat("\n");
+			}
+
+			reader.close();
+
+		} catch (FileNotFoundException fnfException) {
+			// Opening the file failed.
+		} catch (IOException ioException) {
+			// Reading or closing the file failed.
+		}
+
+		fileText = text;
+	}
+
 }
