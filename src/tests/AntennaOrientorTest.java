@@ -5,7 +5,7 @@ import static org.junit.Assert.assertEquals;
 import java.util.Iterator;
 
 import logging.FileLogger;
-import model.AntennaOrientationAlgorithm;
+import model.AntennaOrientor;
 import model.Graph;
 import model.Link;
 import model.Node;
@@ -15,7 +15,7 @@ import model.WeightedGraph;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
-public class AntennaOrientationAlgorithmTest {
+public class AntennaOrientorTest {
 
 	Node a = new Node("A", 0f, 0f);
 	Node b = new Node("B", 0f, 4f);
@@ -44,7 +44,7 @@ public class AntennaOrientationAlgorithmTest {
 		pn.insertEdge(a, b, AB);
 
 		// Run the orientation algorithm.
-		AntennaOrientationAlgorithm aoa = new AntennaOrientationAlgorithm(pn);
+		AntennaOrientor aoa = new AntennaOrientor(pn);
 
 		WeightedGraph<Sensor, Link> dirNet = aoa.getDirNet();
 		Iterator<Sensor> iter = dirNet.vertices().iterator();
@@ -81,7 +81,7 @@ public class AntennaOrientationAlgorithmTest {
 		pn.insertEdge(b, c, BC);
 
 		// Run the orientation algorithm.
-		AntennaOrientationAlgorithm aoa = new AntennaOrientationAlgorithm(pn);
+		AntennaOrientor aoa = new AntennaOrientor(pn);
 
 		Graph<Sensor, Link> dirNet = aoa.getDirNet();
 		Iterator<Sensor> iter = dirNet.vertices().iterator();
@@ -119,7 +119,7 @@ public class AntennaOrientationAlgorithmTest {
 		pn.insertEdge(c, d, CD);
 
 		// Calculate the orientation.
-		AntennaOrientationAlgorithm aoa = new AntennaOrientationAlgorithm(pn);
+		AntennaOrientor aoa = new AntennaOrientor(pn);
 
 		// Verify calculated values for statistical averages.
 		// Expected values calculated on paper by me!

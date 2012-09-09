@@ -35,7 +35,7 @@ import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
 
 import logging.FileLogger;
-import model.AntennaOrientationAlgorithm;
+import model.AntennaOrientor;
 import model.GraphParser;
 import model.Link;
 import model.Node;
@@ -79,7 +79,7 @@ public class NetworkGUI extends JPanel implements ActionListener {
 
 	// Class members.
 	private JCanvas canvas;
-	private AntennaOrientationAlgorithm aoa;
+	private AntennaOrientor aoa;
 	private String selectedNetwork = "";
 
 	public static void main(String[] args) {
@@ -490,7 +490,7 @@ public class NetworkGUI extends JPanel implements ActionListener {
 
 				// Run the orientation algorithm.
 				if (pn != null) {
-					this.aoa = new AntennaOrientationAlgorithm(pn);
+					this.aoa = new AntennaOrientor(pn);
 					JOptionPane.showMessageDialog(this.getRootPane(),
 							"Network loaded!");
 

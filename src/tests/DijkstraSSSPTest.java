@@ -5,7 +5,7 @@ import static org.junit.Assert.assertEquals;
 import java.util.ArrayList;
 
 import logging.FileLogger;
-import model.AntennaOrientationAlgorithm;
+import model.AntennaOrientor;
 import model.Link;
 import model.Node;
 import model.Sensor;
@@ -44,7 +44,7 @@ public class DijkstraSSSPTest {
 		pn.insertEdge(a, b, new Link(a.getName() + b.getName()));
 
 		// Run the orientation algorithm.
-		AntennaOrientationAlgorithm aoa = new AntennaOrientationAlgorithm(pn);
+		AntennaOrientor aoa = new AntennaOrientor(pn);
 
 		WeightedGraph<Sensor, Link> dirNet = aoa.getDirNet();
 

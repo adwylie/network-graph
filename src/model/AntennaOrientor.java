@@ -14,15 +14,20 @@ import ui.NetworkGUI;
 import algorithms.DijkstraSSSP;
 import algorithms.KruskalMST;
 
-// Calculates the relevant values for omnidirectional and directional antennas,
-// along with providing methods for changing between them.
-// All Sensors have the same range.
-
-public class AntennaOrientationAlgorithm {
+/**
+ * Calculates the relevant values for omnidirectional and directional antennas,
+ * along with providing methods for changing between them. All Sensors have the
+ * same range.
+ * 
+ * @author Andrew Wylie <andrew.dale.wylie@gmail.com>
+ * @version 1.0
+ * @since 2011-09-10
+ */
+public class AntennaOrientor {
 
 	// Set logging true if this is a compiled class, false if the class is
 	// in a jar file.
-	private static boolean logging = !AntennaOrientationAlgorithm.class
+	private static boolean logging = !AntennaOrientor.class
 			.getProtectionDomain().getCodeSource().getLocation().toString()
 			.contains("jar");
 
@@ -45,7 +50,7 @@ public class AntennaOrientationAlgorithm {
 	// //////////////////// Network Setup & Init. ////////////////////////////
 	// /////////////////////////////////////////////////////////////////////////
 
-	public AntennaOrientationAlgorithm(WeightedGraph<Node, Link> pNet) {
+	public AntennaOrientor(WeightedGraph<Node, Link> pNet) {
 		this.mst = new KruskalMST<Node, Link>(pNet);
 
 		// Build the actual networks.
