@@ -38,6 +38,7 @@ import logging.FileLogger;
 import model.DirectionalNetwork;
 import model.GraphParser;
 import model.Link;
+import model.NetworkType;
 import model.Node;
 import model.OmnidirectionalNetwork;
 import model.Sensor;
@@ -82,7 +83,7 @@ public class NetworkGUI extends JPanel implements ActionListener {
 	private JCanvas canvas;
 	private DirectionalNetwork dirNet = null;
 	private OmnidirectionalNetwork omniNet = null;
-	private String selectedNetwork = "";
+	private NetworkType selectedNetwork = null;
 
 	public static void main(String[] args) {
 		// Schedule a job for the event-dispatching thread:
@@ -126,7 +127,7 @@ public class NetworkGUI extends JPanel implements ActionListener {
 	public NetworkGUI() {
 
 		// Set the layout of the main (this) panel.
-		this.setLayout(new BoxLayout(this, BoxLayout.LINE_AXIS));
+		setLayout(new BoxLayout(this, BoxLayout.LINE_AXIS));
 		GridBagConstraints c;
 
 		// Create the optionList JPanel. It will hold all of the buttons and
@@ -153,7 +154,7 @@ public class NetworkGUI extends JPanel implements ActionListener {
 
 		// Create the buttons for displaying the graph.
 		JRadioButton drawDirButton = new JRadioButton("Directional");
-		JRadioButton drawOmniButton = new JRadioButton("Omni-Directional");
+		JRadioButton drawOmniButton = new JRadioButton("Omnidirectional");
 
 		// Create a button group for the buttons.
 		ButtonGroup drawNetworkButtonGroup = new ButtonGroup();
@@ -461,10 +462,10 @@ public class NetworkGUI extends JPanel implements ActionListener {
 		// /////////////////////////////////////////////////////////////////////
 
 		// Add all of the components to the main content pane.
-		this.add(Box.createRigidArea(new Dimension(5, 0)));
-		this.add(optionList);
-		this.add(Box.createRigidArea(new Dimension(5, 0)));
-		this.add(canvas);
+		add(Box.createRigidArea(new Dimension(5, 0)));
+		add(optionList);
+		add(Box.createRigidArea(new Dimension(5, 0)));
+		add(canvas);
 
 		optionList.add(drawNetworkPanel);
 		optionList.add(setupPanel);
@@ -498,9 +499,12 @@ public class NetworkGUI extends JPanel implements ActionListener {
 							"Network loaded!");
 
 					// Draw the network on load if there is one selected.
-					if ("directional".equals(selectedNetwork)) {
+					if (selectedNetwork != null
+							&& NetworkType.DIRECTIONAL.equals(selectedNetwork)) {
 						drawGraph(dirNet.getLogicalNetwork());
-					} else if ("omnidirectional".equals(selectedNetwork)) {
+					} else if (selectedNetwork != null
+							&& NetworkType.OMNIDIRECTIONAL
+									.equals(selectedNetwork)) {
 						drawGraph(omniNet.getLogicalNetwork());
 					}
 				}
@@ -513,13 +517,13 @@ public class NetworkGUI extends JPanel implements ActionListener {
 				drawGraph(dirNet.getLogicalNetwork());
 			}
 			// Keep track of which network is visible.
-			selectedNetwork = "directional";
+			selectedNetwork = NetworkType.DIRECTIONAL;
 
 		} else if ("drawOmni".equals(e.getActionCommand())) {
 			if (omniNet != null) {
 				drawGraph(omniNet.getLogicalNetwork());
 			}
-			selectedNetwork = "omnidirectional";
+			selectedNetwork = NetworkType.OMNIDIRECTIONAL;
 		}
 
 		// Make sure that a graph is loaded before any actual commands are
@@ -534,36 +538,38 @@ public class NetworkGUI extends JPanel implements ActionListener {
 		if ("getPath".equals(e.getActionCommand())) {
 
 			// There must be a network currently selected.
-			if (this.selectedNetwork.equals("")) {
+			if (selectedNetwork == null) {
 				JOptionPane.showMessageDialog(this.getRootPane(),
 						"A network must be selected for"
 								+ " which to find a path in.");
 			} else
 
 			// Code for the shortest specified path button.
-			if (this.pathFromTextField.getText().equals("")
-					|| this.pathToTextField.getText().equals("")) {
+			if (pathFromTextField.getText().equals("")
+					|| pathToTextField.getText().equals("")) {
 				// Create dialog to inform user to enter info.
 				JOptionPane.showMessageDialog(this.getRootPane(),
 						"Enter sensor names to find"
 								+ " the shortest path between them.");
 			} else {
 				// Set up some temporary variables to prevent code repetition.
-				String fromText = this.pathFromTextField.getText();
-				String toText = this.pathToTextField.getText();
+				String fromText = pathFromTextField.getText();
+				String toText = pathToTextField.getText();
 				List<Sensor> sPath = null;
 				float sPathLen = 0f;
 				int sPathLenHops = 0;
 
 				// Get the route length.
-				if ("directional".equals(this.selectedNetwork)) {
+				if (selectedNetwork != null
+						&& NetworkType.DIRECTIONAL.equals(selectedNetwork)) {
 
 					sPathLenHops = dirNet.getShortestPathLengthHops(fromText,
 							toText);
 					sPathLen = dirNet.getShortestPathLength(fromText, toText);
 					sPath = dirNet.getShortestPath(fromText, toText);
 
-				} else if ("omnidirectional".equals(this.selectedNetwork)) {
+				} else if (selectedNetwork != null
+						&& NetworkType.OMNIDIRECTIONAL.equals(selectedNetwork)) {
 
 					sPathLenHops = omniNet.getShortestPathLengthHops(fromText,
 							toText);
@@ -580,9 +586,9 @@ public class NetworkGUI extends JPanel implements ActionListener {
 				// at the correct spot.
 				if (sPath != null) {
 					// Get the current elements graphics object (main panel).
-					Graphics2D g = ((Graphics2D) this.getGraphics());
+					Graphics2D g = ((Graphics2D) getGraphics());
 					// Redraw it so that any old paths are erased.
-					this.update(g);
+					update(g);
 
 					// Apply the transformation to change our basis to the
 					// canvas' basis.
@@ -608,10 +614,10 @@ public class NetworkGUI extends JPanel implements ActionListener {
 		if ("applySetup".equals(e.getActionCommand())) {
 
 			// Update Range.
-			String newRangeText = this.rangeUpdateTextField.getText();
+			String newRangeText = rangeUpdateTextField.getText();
 
 			// There must be a network currently selected.
-			if (this.selectedNetwork.equals("")) {
+			if (selectedNetwork == null) {
 				JOptionPane.showMessageDialog(this.getRootPane(),
 						"A network must be selected for"
 								+ " which to update sensor range.");
@@ -628,40 +634,45 @@ public class NetworkGUI extends JPanel implements ActionListener {
 
 				float newRange = Float.parseFloat(newRangeText);
 
-				if ("directional".equals(this.selectedNetwork)) {
+				if (selectedNetwork != null
+						&& NetworkType.DIRECTIONAL.equals(selectedNetwork)) {
 					dirNet.updateDirRange(newRange);
-				} else if ("omnidirectional".equals(this.selectedNetwork)) {
+				} else if (selectedNetwork != null
+						&& NetworkType.OMNIDIRECTIONAL.equals(selectedNetwork)) {
 					omniNet.updateOmniRange(newRange);
 				}
 
 				// Repaint to reflect the changes made to the model.
-				this.canvas.update(this.canvas.getGraphics());
+				canvas.update(canvas.getGraphics());
 			}
 
 		} else if ("resetSetup".equals(e.getActionCommand())) {
 			// There must be a network currently selected.
-			if (this.selectedNetwork.equals("")) {
+			if (selectedNetwork == null) {
 				JOptionPane.showMessageDialog(this.getRootPane(),
 						"A network must be selected for"
 								+ " which to reset sensor range.");
 			}
 
-			this.rangeUpdateTextField.setText("");
+			rangeUpdateTextField.setText("");
 
-			if ("directional".equals(selectedNetwork)) {
+			if (selectedNetwork != null
+					&& NetworkType.DIRECTIONAL.equals(selectedNetwork)) {
 				dirNet.setupLogicalNetwork();
 				drawGraph(dirNet.getLogicalNetwork());
-			} else if ("omnidirectional".equals(selectedNetwork)) {
+			} else if (selectedNetwork != null
+					&& NetworkType.OMNIDIRECTIONAL.equals(selectedNetwork)) {
 				omniNet.setupLogicalNetwork();
 				drawGraph(omniNet.getLogicalNetwork());
 			}
 
 			// Repaint to reflect the changes made to the model.
-			this.canvas.update(this.canvas.getGraphics());
+			canvas.update(canvas.getGraphics());
 		}
 
 		// On any event we want to...
-		if ("directional".equals(this.selectedNetwork)) {
+		if (selectedNetwork != null
+				&& NetworkType.DIRECTIONAL.equals(selectedNetwork)) {
 			// Update the normal graph statistics.
 			averageAngleTextField.setText(numFormatter.format(dirNet
 					.getAverageAngle()));
@@ -682,7 +693,8 @@ public class NetworkGUI extends JPanel implements ActionListener {
 			graphDiameterHopsTextField.setText(numFormatter.format(dirNet
 					.getDiameterHops()));
 
-		} else if ("omnidirectional".equals(this.selectedNetwork)) {
+		} else if (selectedNetwork != null
+				&& NetworkType.OMNIDIRECTIONAL.equals(selectedNetwork)) {
 			// Update the normal graph statistics.
 			averageAngleTextField.setText(numFormatter.format(omniNet
 					.getAverageAngle()));
