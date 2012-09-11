@@ -6,6 +6,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.LinkedHashSet;
 import java.util.Set;
 
 import ui.Drawable;
@@ -19,12 +20,12 @@ public class Graph<V extends VertexInterface, E extends EdgeInterface>
 		implements GraphInterface<V, E>, Drawable {
 
 	// Vertex/Edge maps to each other.
-	protected HashMap<E, HashSet<V>> edgesToVertices = new HashMap<E, HashSet<V>>();
-	protected HashMap<V, HashSet<E>> verticesToEdges = new HashMap<V, HashSet<E>>();
+	protected HashMap<E, Set<V>> edgesToVertices = new HashMap<E, Set<V>>();
+	protected HashMap<V, Set<E>> verticesToEdges = new HashMap<V, Set<E>>();
 
 	// General container for Vertices/Edges.
-	protected HashSet<V> vertices = new HashSet<V>();
-	protected HashSet<E> edges = new HashSet<E>();
+	protected Set<V> vertices = new HashSet<V>();
+	protected Set<E> edges = new HashSet<E>();
 
 	@Override
 	public Set<V> vertices() {
@@ -66,7 +67,7 @@ public class Graph<V extends VertexInterface, E extends EdgeInterface>
 		}
 
 		// Get the vertices for the edge.
-		HashSet<V> vertices = edgesToVertices.get(edge);
+		Set<V> vertices = edgesToVertices.get(edge);
 
 		if (vertices.contains(vertex)) {
 			// We know this was a valid search. Return the opposite vertex.
@@ -92,8 +93,8 @@ public class Graph<V extends VertexInterface, E extends EdgeInterface>
 		}
 
 		// Two vertices are adjacent if they share a common edge.
-		HashSet<E> vEdges = verticesToEdges.get(v);
-		HashSet<E> uEdges = verticesToEdges.get(u);
+		Set<E> vEdges = verticesToEdges.get(v);
+		Set<E> uEdges = verticesToEdges.get(u);
 
 		return !Collections.disjoint(vEdges, uEdges);
 	}
@@ -152,9 +153,9 @@ public class Graph<V extends VertexInterface, E extends EdgeInterface>
 		edges.add(edge);
 
 		// Add to the edges -> vertices dictionary.
-		HashSet<V> vertices = new HashSet<V>();
-		vertices.add(u);
+		LinkedHashSet<V> vertices = new LinkedHashSet<V>();
 		vertices.add(v);
+		vertices.add(u);
 
 		edgesToVertices.put(edge, vertices);
 
@@ -176,7 +177,7 @@ public class Graph<V extends VertexInterface, E extends EdgeInterface>
 
 		// Get all the edges which attach to the vertex and
 		// remove them. Then we remove the vertex itself.
-		HashSet<E> vertexEdges = verticesToEdges.get(vertex);
+		Set<E> vertexEdges = verticesToEdges.get(vertex);
 		Iterator<E> vertexEdgesIter = vertexEdges.iterator();
 
 		while (vertexEdgesIter.hasNext()) {

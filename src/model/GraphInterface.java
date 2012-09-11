@@ -94,7 +94,7 @@ public interface GraphInterface<V extends VertexInterface, E extends EdgeInterfa
 	V insertVertex(V vertex);
 
 	/**
-	 * Insert and return a new edge with end vertices v and u.
+	 * Insert and return a new directed edge linking from vertex v to vertex u.
 	 * 
 	 * @param v
 	 *            a vertex.
