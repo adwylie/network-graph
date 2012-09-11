@@ -73,7 +73,7 @@ public class Node implements VertexInterface, Drawable {
 		int nameXPos = (int) (getX() + (radius * 1.5f));
 		int nameYPos = (int) (getY());
 
-		g.setFont(new Font("Dialog", Font.PLAIN, 14));
+		g.setFont(new Font("Dialog", Font.BOLD, 14));
 		g.drawString(getName(), nameXPos, nameYPos);
 	}
 

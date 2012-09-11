@@ -2,6 +2,10 @@ package model;
 
 import java.awt.Color;
 import java.awt.Graphics;
+import java.awt.Graphics2D;
+import java.awt.Polygon;
+import java.awt.Shape;
+import java.awt.geom.AffineTransform;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -228,18 +232,6 @@ public class Graph<V extends VertexInterface, E extends EdgeInterface>
 	@Override
 	public void paint(Graphics g) {
 
-		Iterator<V> verticesIterator = vertices().iterator();
-
-		// Draw the vertices of the graph.
-		while (verticesIterator.hasNext()) {
-
-			V vertex = verticesIterator.next();
-
-			if (vertex instanceof Drawable) {
-				((Drawable) vertex).paint(g);
-			}
-		}
-
 		// Draw the edges of the graph.
 		// For each edge get its vertices, and then draw a line between the
 		// vertices.
@@ -260,10 +252,55 @@ public class Graph<V extends VertexInterface, E extends EdgeInterface>
 			int uy = (int) u.getY();
 
 			if (v instanceof Drawable && u instanceof Drawable) {
-				g.setColor(Color.BLACK);
+				g.setColor(Color.black);
 				g.drawLine(vx, vy, ux, uy);
+
+				// Draw an arrow to indicate edge direction.
+				((Graphics2D) g).fill(getArrowHead(vx, vy, ux, uy));
 			}
 		}
+
+		// Draw the vertices of the graph.
+		Iterator<V> verticesIterator = vertices().iterator();
+
+		while (verticesIterator.hasNext()) {
+
+			V vertex = verticesIterator.next();
+
+			if (vertex instanceof Drawable) {
+				g.setColor(Color.black);
+				((Drawable) vertex).paint(g);
+			}
+		}
+
 	}
 
+	// Get a polygon resembling an arrowhead pointing in the direction from
+	// point vx, vy towards ux, uy.
+	private Shape getArrowHead(float vx, float vy, float ux, float uy) {
+
+		int height = 4;
+		int length = 10;
+		int[] xPoints = { (int) (ux - length), (int) ux, (int) (ux - length) };
+		int[] yPoints = { (int) (uy - height), (int) uy, (int) (uy + height) };
+
+		Polygon arrow = new Polygon(xPoints, yPoints, 3);
+
+		// Get the angle of the slope made by the passed in points.
+		float x = ux - vx;
+		float y = uy - vy;
+
+		double direction = Math.atan2(y, x);
+
+		if (direction < 0) {
+			direction += 2 * Math.PI;
+		}
+
+		AffineTransform transform = new AffineTransform();
+		transform.rotate(direction, ux, uy);
+
+		Shape arrowTransformed = transform.createTransformedShape(arrow);
+
+		return arrowTransformed;
+	}
 }

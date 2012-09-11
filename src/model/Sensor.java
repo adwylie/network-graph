@@ -147,7 +147,7 @@ public class Sensor extends Node implements Drawable {
 	}
 
 	// Drawing related code.
-	private int transparentBlue = Color.BLUE.getRGB() & 0x37FFFFFF;
+	private int transparentBlue = Color.BLUE.getRGB() & 0x28FFFFFF;
 	private Color antennaColor = new Color(transparentBlue, true);
 
 	@Override
