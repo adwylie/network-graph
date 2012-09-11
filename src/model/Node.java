@@ -54,7 +54,7 @@ public class Node implements VertexInterface, Drawable {
 	}
 
 	// Drawing related code.
-	private float radius = 6;
+	private float radius = 4;
 
 	@Override
 	public void paint(Graphics g) {
