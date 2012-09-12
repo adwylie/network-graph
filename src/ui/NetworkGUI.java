@@ -556,32 +556,30 @@ public class NetworkGUI extends JPanel implements ActionListener {
 			}
 
 			// Set up some temporary variables to prevent code repetition.
-			String fromText = pathFromTextField.getText();
-			String toText = pathToTextField.getText();
-			List<Sensor> sPath = null;
-			float sPathLen = 0f;
+			String from = pathFromTextField.getText();
+			String to = pathToTextField.getText();
 			int sPathLenHops = 0;
+			float sPathLen = 0f;
+			List<Sensor> sPath = null;
 
 			// Get the route length.
-			if (selectedNetwork != null
-					&& NetworkType.DIRECTIONAL.equals(selectedNetwork)) {
+			if (selectedNetwork != null) {
+				if (NetworkType.DIRECTIONAL.equals(selectedNetwork)) {
 
-				sPathLenHops = dirNet.getShortestPathLengthHops(fromText,
-						toText);
-				sPathLen = dirNet.getShortestPathLength(fromText, toText);
-				sPath = dirNet.getShortestPath(fromText, toText);
+					sPathLenHops = dirNet.getShortestPathLengthHops(from, to);
+					sPathLen = dirNet.getShortestPathLength(from, to);
+					sPath = dirNet.getShortestPath(from, to);
 
-			} else if (selectedNetwork != null
-					&& NetworkType.OMNIDIRECTIONAL.equals(selectedNetwork)) {
+				} else if (NetworkType.OMNIDIRECTIONAL.equals(selectedNetwork)) {
 
-				sPathLenHops = omniNet.getShortestPathLengthHops(fromText,
-						toText);
-				sPathLen = omniNet.getShortestPathLength(fromText, toText);
-				sPath = omniNet.getShortestPath(fromText, toText);
+					sPathLenHops = omniNet.getShortestPathLengthHops(from, to);
+					sPathLen = omniNet.getShortestPathLength(from, to);
+					sPath = omniNet.getShortestPath(from, to);
+				}
 			}
 
-			pathLengthTextField.setText(numFormatter.format(sPathLen));
 			pathLengthHopsTextField.setText(numFormatter.format(sPathLenHops));
+			pathLengthTextField.setText(numFormatter.format(sPathLen));
 
 			// Get and draw the route itself.
 			// Paint over the canvas, but use its transform so we can draw

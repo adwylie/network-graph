@@ -1,6 +1,5 @@
 package model;
 
-import java.util.ArrayList;
 import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.List;
@@ -243,6 +242,27 @@ public abstract class Network {
 	}
 
 	public float getShortestPathLength(String u, String v) {
+
+		Iterator<Sensor> sensorIter = logicalNetwork.vertices().iterator();
+		Sensor from = null;
+		Sensor to = null;
+
+		while (sensorIter.hasNext()) {
+			Sensor sensor = sensorIter.next();
+
+			if (sensor.getName().equals(u)) {
+				from = sensor;
+			}
+
+			if (sensor.getName().equals(v)) {
+				to = sensor;
+			}
+		}
+
+		if (from != null && to != null) {
+			return getShortestPathLength(from, to);
+		}
+
 		return 0f;
 	}
 
@@ -267,6 +287,27 @@ public abstract class Network {
 	}
 
 	public int getShortestPathLengthHops(String u, String v) {
+
+		Iterator<Sensor> sensorIter = logicalNetwork.vertices().iterator();
+		Sensor from = null;
+		Sensor to = null;
+
+		while (sensorIter.hasNext()) {
+			Sensor sensor = sensorIter.next();
+
+			if (sensor.getName().equals(u)) {
+				from = sensor;
+			}
+
+			if (sensor.getName().equals(v)) {
+				to = sensor;
+			}
+		}
+
+		if (from != null && to != null) {
+			return getShortestPathLengthHops(from, to);
+		}
+
 		return 0;
 	}
 
@@ -290,7 +331,28 @@ public abstract class Network {
 	}
 
 	public List<Sensor> getShortestPath(String u, String v) {
-		return new ArrayList<Sensor>();
+
+		Iterator<Sensor> sensorIter = logicalNetwork.vertices().iterator();
+		Sensor from = null;
+		Sensor to = null;
+
+		while (sensorIter.hasNext()) {
+			Sensor sensor = sensorIter.next();
+
+			if (sensor.getName().equals(u)) {
+				from = sensor;
+			}
+
+			if (sensor.getName().equals(v)) {
+				to = sensor;
+			}
+		}
+
+		if (from != null && to != null) {
+			return getShortestPath(from, to);
+		}
+
+		return null;
 	}
 
 	/**
