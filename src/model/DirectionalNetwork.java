@@ -9,7 +9,7 @@ import java.util.Set;
 
 public class DirectionalNetwork extends Network {
 
-	int averageIdx = 0;
+	int index = 0;
 
 	/**
 	 * Constructor for a network.
@@ -22,55 +22,131 @@ public class DirectionalNetwork extends Network {
 		super(physicalNetwork);
 	}
 
-	@Override
-	public void setupLogicalNetwork() {
+	/**
+	 * Create a network from the logical network which is optimal.
+	 * 
+	 * @param sameRange
+	 *            a boolean value indicating whether all sensors will have the
+	 *            same range.
+	 * 
+	 * @return the constructed network.
+	 */
+	public WeightedGraph<Sensor, Link> createOptimalNetwork(boolean sameRange) {
 
-		// Our antenna range needs to be at least as large as
-		// the longest edge. (Range is measured as radius)
-		List<Link> edges = new ArrayList<Link>(logicalNetwork.edges());
-		Collections.sort(edges);
-
-		// The list is sorted in non-decreasing order, so get the last element.
-		int numEdges = edges.size();
-		float edgeLen = 0f;
-
-		if (numEdges > 0) {
-			edgeLen = edges.get(numEdges - 1).getWeight();
+		if (sameRange) {
+			return createNetwork(getOptimalAntennaRange());
+		} else {
+			return createOptimalNetwork();
 		}
-
-		setupDirNet(edgeLen);
 	}
 
-	// Set up the directional network. This function takes as a parameter the
-	// sensor range to set. (all sensors have identical range. It calls the
-	// function setSensorPropsDirNet to set each sensors properties.
-	private void setupDirNet(float sensorRange) {
+	/**
+	 * Create a network from the logical network which is fully optimal.
+	 * 
+	 * Sensors may have different ranges.
+	 * 
+	 * @return the constructed network.
+	 */
+	private WeightedGraph<Sensor, Link> createOptimalNetwork() {
 
-		// Reset the variables used for statistics.
-		averageAngle = 0;
-		averageRange = 0;
-		totalEnergyUse = 0;
+		return null;
+	}
 
-		// For each vertex.
-		Set<Sensor> vertices = logicalNetwork.vertices();
-		Iterator<Sensor> verticesIter = vertices.iterator();
+	/**
+	 * Create a network from the logical network.
+	 * 
+	 * The network created will be configured such that all sensors have the
+	 * same range.
+	 * 
+	 * @param sensorRange
+	 *            the range for each sensor.
+	 * 
+	 * @return the constructed network.
+	 */
+	public WeightedGraph<Sensor, Link> createNetwork(float sensorRange) {
 
-		while (verticesIter.hasNext()) {
-			// Get the connected edges.
-			Sensor sensor = verticesIter.next();
-			Set<Link> edges = logicalNetwork.incidentEdges(sensor);
-			// Get the opposite vertices'.
-			HashSet<Sensor> connectedVertices = new HashSet<Sensor>();
-			Iterator<Link> edgesIter = edges.iterator();
-			while (edgesIter.hasNext()) {
-				connectedVertices.add(logicalNetwork.opposite(sensor,
-						edgesIter.next()));
-			}
-			// Pass in values to set sensor properties.
-			setSensorPropsDirNet(sensor, connectedVertices, sensorRange);
-			averageIdx = 0;
+		resetStatistics();
+		WeightedGraph<Sensor, Link> network = new WeightedGraph<Sensor, Link>();
+
+		// Add all vertices in the logical network to the new network.
+		Iterator<Sensor> vertsIter = logicalNetwork.vertices().iterator();
+
+		while (vertsIter.hasNext()) {
+			network.insertVertex(vertsIter.next());
 		}
 
+		// Add edges which have the proper sensor range to the network.
+		Iterator<Sensor> vertsUIter = logicalNetwork.vertices().iterator();
+		Iterator<Sensor> vertsVIter;
+		index = 0;
+
+		// For every pair of vertices, if their distance is less than or equal
+		// to the new distance we want to create an edge between them. Only do
+		// this if the vertices are not the same.
+		while (vertsUIter.hasNext()) {
+
+			Sensor u = vertsUIter.next();
+
+			u.setAntennaType(AntennaType.DIRECTIONAL);
+			u.setAntennaRange(sensorRange);
+
+			vertsVIter = logicalNetwork.vertices().iterator();
+
+			while (vertsVIter.hasNext()) {
+				Sensor v = vertsVIter.next();
+
+				// If the distance is less than the range then we add an edge.
+				if (getDistance(u, v) <= sensorRange && v != u) {
+
+					Link newEdge = new Link(u.getName() + v.getName());
+					network.insertEdge(u, v, newEdge);
+
+				}
+			}
+		}
+
+		// Set the antenna ranges & angles.
+		vertsIter = network.vertices().iterator();
+
+		while (vertsIter.hasNext()) {
+
+			Sensor sensor = vertsIter.next();
+
+			// First get the connected edges. Then filter them by using only
+			// outgoing edges. According to the edges we can then find the
+			// correct angle and distance.
+			Iterator<Link> edgeIter = network.incidentEdges(sensor).iterator();
+
+			Set<Link> outgoingEdges = new HashSet<Link>();
+
+			while (edgeIter.hasNext()) {
+				Link link = edgeIter.next();
+
+				// If the first end vertex (from) of the edge is the same as the
+				// sensor then we know we have an outgoing edge. So add it to
+				// the list.
+				if (network.endVertices(link).iterator().next().equals(sensor)) {
+					// TODO add iterator.next() to connectedVertices instead.
+					outgoingEdges.add(link);
+				}
+			}
+
+			// Get the opposite vertices.
+			HashSet<Sensor> connectedVertices = new HashSet<Sensor>();
+			Iterator<Link> outgoingEdgesIter = outgoingEdges.iterator();
+
+			while (outgoingEdgesIter.hasNext()) {
+
+				Link link = outgoingEdgesIter.next();
+				Sensor s = network.opposite(sensor, link);
+				connectedVertices.add(s);
+			}
+
+			setSensorProps(sensor, connectedVertices, sensorRange);
+		}
+		index = 0;
+
+		return network;
 	}
 
 	// This function computes the direction and angle of a sensor. It is given
@@ -80,7 +156,7 @@ public class DirectionalNetwork extends Network {
 	// the largest angle - 180 modulus 360.
 	// Although it is not used currently, the longest range needed is also
 	// calculated.
-	private void setSensorPropsDirNet(Sensor fromSensor, Set<Sensor> toSensors,
+	private void setSensorProps(Sensor fromSensor, Set<Sensor> toSensors,
 			float range) {
 
 		// Find the angle needed using the toVertices positions.
@@ -168,69 +244,57 @@ public class DirectionalNetwork extends Network {
 		fromSensor.setAntennaAngle(angle);
 		fromSensor.setAntennaRange(range);
 
-		// Keep track of average angles & range
-		averageAngle = (averageAngle * averageIdx / (averageIdx + 1))
-				+ (fromSensor.getAntennaAngle() * 1 / (averageIdx + 1));
-		averageRange = (averageRange * averageIdx / (averageIdx + 1))
-				+ (fromSensor.getAntennaRange() * 1 / (averageIdx + 1));
-		totalEnergyUse += (0.5f * Math.pow(fromSensor.getAntennaRange(), 2) * fromSensor
-				.getAntennaAngle());
-		averageIdx++;
+		// Keep track of average angles & range.
+		float sensorAngle = fromSensor.getAntennaAngle();
+		float sensorRange = fromSensor.getAntennaRange();
+
+		double previousWeightedAngle = averageAngle * index / (index + 1);
+		double previousWeightedRange = averageRange * index / (index + 1);
+
+		double nextWeightedAngle = sensorAngle * 1 / (index + 1);
+		double nextWeightedRange = sensorRange * 1 / (index + 1);
+
+		averageAngle = previousWeightedAngle + nextWeightedAngle;
+		averageRange = previousWeightedRange + nextWeightedRange;
+		totalEnergyUse += (0.5f * Math.pow(sensorRange, 2) * sensorAngle);
+
+		index++;
 	}
 
-	// Similar to the above function (updateOmniRange), this function updates
-	// the edges in the directional network with respect to the input range.
-	public void updateDirRange(float newRange) {
+	/**
+	 * Get the longest edge weight connecting two vertices.
+	 * 
+	 * Only edges in the logical network (MST of the input network) are taken
+	 * into account. This produces the optimal antenna range in the case that
+	 * all sensors must have the same range.
+	 * 
+	 * @return the longest edge weight.
+	 */
+	private float getOptimalAntennaRange() {
 
-		// Get iterators for the vertices.
-		Iterator<Sensor> vertsUIter = logicalNetwork.vertices().iterator();
-		Iterator<Sensor> vertsVIter;
+		// Our antenna range needs to be at least as large as
+		// the longest edge. (Range is measured as radius)
+		List<Link> edges = new ArrayList<Link>(logicalNetwork.edges());
+		Collections.sort(edges);
 
-		// For every pair of vertices, if their distance is less than or equal
-		// to the new distance we want to create an edge between them. Only do
-		// this if the vertices are not the same. (no self loops)
-		while (vertsUIter.hasNext()) {
-			Sensor u = vertsUIter.next();
-			u.setAntennaRange(newRange);
-			vertsVIter = logicalNetwork.vertices().iterator();
+		// The list is sorted in non-decreasing order, so get the last element.
+		int numEdges = edges.size();
+		float edgeLength = 0f;
 
-			while (vertsVIter.hasNext()) {
-				Sensor v = vertsVIter.next();
-
-				// If the distance is less than the range then we add an edge.
-				// We only add an edge if they are not already connected.
-				if (getDistance(u, v) <= newRange) {
-					if (v != u && !logicalNetwork.areAdjacent(u, v)) {
-						logicalNetwork.insertEdge(u, v, new Link(u.getName()
-								+ v.getName()));
-					}
-				} else {
-					// If the distance is greater than the range the we remove
-					// the edge. Clearly we can only do this if there is an
-					// edge to remove.
-					if (logicalNetwork.areAdjacent(u, v)) {
-						// Find the edge and remove it.
-						Set<Link> vEdges = logicalNetwork.incidentEdges(v);
-						Set<Link> uEdges = logicalNetwork.incidentEdges(u);
-
-						Iterator<Link> iter = vEdges.iterator();
-						while (iter.hasNext()) {
-							Link e = iter.next();
-							if (uEdges.contains(e)) {
-								logicalNetwork.removeEdge(e);
-								// Concurrent Modification Error
-								iter = vEdges.iterator();
-							}
-						}
-					}
-				}
-
-			}
+		if (numEdges > 0) {
+			edgeLength = edges.get(numEdges - 1).getWeight();
 		}
 
-		// After changing our graph structure, rerun our algorithm to set
-		// the antenna ranges, angles, etc.
-		setupDirNet(newRange);
+		return edgeLength;
+	}
+
+	/**
+	 * Reset the variables used for statistics.
+	 */
+	private void resetStatistics() {
+		averageAngle = 0;
+		averageRange = 0;
+		totalEnergyUse = 0;
 	}
 
 }

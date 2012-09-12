@@ -13,6 +13,10 @@ public abstract class Network {
 	protected WeightedGraph<Node, Link> physicalNetwork = null;
 	protected KruskalMST<Node, Link> physicalNetworkMst = null;
 
+	/**
+	 * The logical network will always have the same graph structure, though
+	 * sensor properties may be changed by antenna orientation methods.
+	 */
 	protected WeightedGraph<Sensor, Link> logicalNetwork = new WeightedGraph<Sensor, Link>();
 
 	protected double averageAngle = 0;
@@ -32,7 +36,6 @@ public abstract class Network {
 		physicalNetworkMst = new KruskalMST<Node, Link>(physicalNetwork);
 
 		initializeLogicalNetwork();
-		setupLogicalNetwork();
 	}
 
 	/**
@@ -78,13 +81,6 @@ public abstract class Network {
 			logicalNetwork.insertEdge(u, v, new Link(edgeName));
 		}
 	}
-
-	/**
-	 * Set up the logical network.
-	 * 
-	 * Sensor properties are set, and statistical information is collected.
-	 */
-	protected abstract void setupLogicalNetwork();
 
 	/**
 	 * Get the direction vector from one sensor to another.

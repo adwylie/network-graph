@@ -18,8 +18,127 @@ public class OmnidirectionalNetwork extends Network {
 		super(physicalNetwork);
 	}
 
-	@Override
-	public void setupLogicalNetwork() {
+	/**
+	 * Create a network from the logical network which is optimal.
+	 * 
+	 * @param sameRange
+	 *            a boolean value indicating whether all sensors will have the
+	 *            same range.
+	 * 
+	 * @return the constructed network.
+	 */
+	public WeightedGraph<Sensor, Link> createOptimalNetwork(boolean sameRange) {
+
+		if (sameRange) {
+			return createNetwork(getOptimalAntennaRange());
+		} else {
+			return createOptimalNetwork();
+		}
+	}
+
+	/**
+	 * Create a network from the logical network which is fully optimal.
+	 * 
+	 * Sensors may have different ranges.
+	 * 
+	 * @return the constructed network.
+	 */
+	private WeightedGraph<Sensor, Link> createOptimalNetwork() {
+
+		resetStatistics();
+		WeightedGraph<Sensor, Link> network = new WeightedGraph<Sensor, Link>();
+
+		// Set the return network to be the same as the logical network.
+
+		// Set each sensor to have a range which is just large enough to reach
+		// all its connected vertices.
+
+		return network;
+
+	}
+
+	/**
+	 * Create a network from the logical network.
+	 * 
+	 * The network created will be configured such that all sensors have the
+	 * same range.
+	 * 
+	 * @param sensorRange
+	 *            the range for each sensor.
+	 * 
+	 * @return the constructed network.
+	 */
+	public WeightedGraph<Sensor, Link> createNetwork(float sensorRange) {
+
+		resetStatistics();
+		WeightedGraph<Sensor, Link> network = new WeightedGraph<Sensor, Link>();
+
+		// Add all vertices in the logical network to the new network.
+		Iterator<Sensor> verticesIter = logicalNetwork.vertices().iterator();
+
+		while (verticesIter.hasNext()) {
+			network.insertVertex(verticesIter.next());
+		}
+
+		// Add edges which have the proper sensor range to the network.
+		Iterator<Sensor> vertsUIter = logicalNetwork.vertices().iterator();
+		Iterator<Sensor> vertsVIter;
+		int index = 0;
+
+		// For every pair of vertices, if their distance is less than or equal
+		// to the new distance we want to create an edge between them. Only do
+		// this if the vertices are not the same.
+		while (vertsUIter.hasNext()) {
+
+			Sensor u = vertsUIter.next();
+
+			u.setAntennaType(AntennaType.OMNIDIRECTIONAL);
+			u.setAntennaRange(sensorRange);
+
+			vertsVIter = logicalNetwork.vertices().iterator();
+
+			while (vertsVIter.hasNext()) {
+				Sensor v = vertsVIter.next();
+
+				// If the distance is less than the range then we add an edge.
+				if (getDistance(u, v) <= sensorRange && v != u) {
+
+					Link newEdge = new Link(u.getName() + v.getName());
+					network.insertEdge(u, v, newEdge);
+				}
+			}
+
+			// Keep track of average angles & range.
+			float sensorAngle = u.getAntennaAngle();
+
+			double previousWeightedAngle = averageAngle * index / (index + 1);
+			double previousWeightedRange = averageRange * index / (index + 1);
+
+			double nextWeightedAngle = sensorAngle * 1 / (index + 1);
+			double nextWeightedRange = sensorRange * 1 / (index + 1);
+
+			averageAngle = previousWeightedAngle + nextWeightedAngle;
+			averageRange = previousWeightedRange + nextWeightedRange;
+
+			// Area = 1/2 r^2 angle.
+			totalEnergyUse += (0.5d * Math.pow(sensorRange, 2) * sensorAngle);
+
+			index++;
+		}
+
+		return network;
+	}
+
+	/**
+	 * Get the longest edge weight connecting two vertices.
+	 * 
+	 * Only edges in the logical network (MST of the input network) are taken
+	 * into account. This produces the optimal antenna range in the case that
+	 * all sensors must have the same range.
+	 * 
+	 * @return the longest edge weight.
+	 */
+	private float getOptimalAntennaRange() {
 
 		// Our antenna range needs to be at least as large as
 		// the longest edge. (Range is measured as radius)
@@ -28,88 +147,23 @@ public class OmnidirectionalNetwork extends Network {
 
 		// The list is sorted in non-decreasing order, so get the last element.
 		int numEdges = edges.size();
-		float edgeLen = 0f;
+		float edgeLength = 0f;
 
 		// Make sure there are no errors if there are no edges.
 		if (numEdges > 0) {
-			edgeLen = edges.get(numEdges - 1).getWeight();
+			edgeLength = edges.get(numEdges - 1).getWeight();
 		}
 
-		setupOmniNet(edgeLen);
+		return edgeLength;
 	}
 
-	// Set up the omnidirectional network. This function takes as a parameter
-	// the sensor range. (all sensors have identical range)
-	private void setupOmniNet(float sensorRange) {
-
-		// Reset variables used for statistics.
+	/**
+	 * Reset the variables used for statistics.
+	 */
+	private void resetStatistics() {
 		averageAngle = 0;
 		averageRange = 0;
 		totalEnergyUse = 0;
-
-		// Now set the antennas.
-		Iterator<Sensor> sensorsIterator = logicalNetwork.vertices().iterator();
-		int averageIdx = 0;
-
-		while (sensorsIterator.hasNext()) {
-			Sensor sensor = sensorsIterator.next();
-			sensor.setAntennaType(AntennaType.OMNIDIRECTIONAL);
-			sensor.setAntennaRange(sensorRange);
-
-			// Keep track of average angles & range
-			averageAngle = (averageAngle * averageIdx / (averageIdx + 1))
-					+ (sensor.getAntennaAngle() * 1 / (averageIdx + 1));
-			averageRange = (averageRange * averageIdx / (averageIdx + 1))
-					+ (sensor.getAntennaRange() * 1 / (averageIdx + 1));
-			// Area = 1/2 r^2 angle.
-			totalEnergyUse += (0.5d * Math.pow(sensor.getAntennaRange(), 2) * sensor
-					.getAntennaAngle());
-
-			averageIdx++;
-		}
-
-	}
-
-	// When the omnidirectional sensor range is set, we simply remove all
-	// edges, then run through all the vertex pairs to add an edge where
-	// appropriate.
-	public void updateOmniRange(float newRange) {
-
-		// Remove all of the edges. Note that we need to reset the iterator as
-		// the set that it is based on is changing.
-		Iterator<Link> edgesIter = logicalNetwork.edges().iterator();
-		while (edgesIter.hasNext()) {
-			logicalNetwork.removeEdge(edgesIter.next());
-			// Concurrent Modification Exception
-			edgesIter = logicalNetwork.edges().iterator();
-		}
-
-		// Get iterators for the vertices.
-		Iterator<Sensor> vertsUIter = logicalNetwork.vertices().iterator();
-		Iterator<Sensor> vertsVIter;
-
-		// For every pair of vertices, if their distance is less than or equal
-		// to the new distance we want to create an edge between them. Only do
-		// this if the vertices are not the same. (no self loops)
-		while (vertsUIter.hasNext()) {
-			Sensor u = vertsUIter.next();
-			u.setAntennaRange(newRange);
-			vertsVIter = logicalNetwork.vertices().iterator();
-
-			while (vertsVIter.hasNext()) {
-				Sensor v = vertsVIter.next();
-
-				if (getDistance(u, v) <= newRange && v != u
-						&& !logicalNetwork.areAdjacent(u, v)) {
-					logicalNetwork.insertEdge(u, v,
-							new Link(u.getName() + v.getName()));
-				}
-			}
-		}
-
-		// After changing our graph structure, rerun our algorithm to set
-		// the antenna ranges, angles, etc.
-		setupOmniNet(newRange);
 	}
 
 }

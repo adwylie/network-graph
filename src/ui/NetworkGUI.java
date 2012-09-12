@@ -497,16 +497,15 @@ public class NetworkGUI extends JPanel implements ActionListener {
 					omniNet = new OmnidirectionalNetwork(pn);
 					JOptionPane.showMessageDialog(this.getRootPane(),
 							"Network loaded!");
+				}
+			}
 
-					// Draw the network on load if there is one selected.
-					if (selectedNetwork != null
-							&& NetworkType.DIRECTIONAL.equals(selectedNetwork)) {
-						drawGraph(dirNet.getLogicalNetwork());
-					} else if (selectedNetwork != null
-							&& NetworkType.OMNIDIRECTIONAL
-									.equals(selectedNetwork)) {
-						drawGraph(omniNet.getLogicalNetwork());
-					}
+			// Draw the network on load if there is one selected.
+			if (selectedNetwork != null) {
+				if (NetworkType.DIRECTIONAL.equals(selectedNetwork)) {
+					drawGraph(dirNet.createOptimalNetwork(true));
+				} else if (NetworkType.OMNIDIRECTIONAL.equals(selectedNetwork)) {
+					drawGraph(omniNet.createOptimalNetwork(true));
 				}
 			}
 		}
@@ -514,14 +513,14 @@ public class NetworkGUI extends JPanel implements ActionListener {
 		// Draw a graph on the drawing action commands.
 		if ("drawDir".equals(e.getActionCommand())) {
 			if (dirNet != null) {
-				drawGraph(dirNet.getLogicalNetwork());
+				drawGraph(dirNet.createOptimalNetwork(true));
 			}
 			// Keep track of which network is visible.
 			selectedNetwork = NetworkType.DIRECTIONAL;
 
 		} else if ("drawOmni".equals(e.getActionCommand())) {
 			if (omniNet != null) {
-				drawGraph(omniNet.getLogicalNetwork());
+				drawGraph(omniNet.createOptimalNetwork(true));
 			}
 			selectedNetwork = NetworkType.OMNIDIRECTIONAL;
 		}
@@ -618,32 +617,28 @@ public class NetworkGUI extends JPanel implements ActionListener {
 
 			// There must be a network currently selected.
 			if (selectedNetwork == null) {
+
 				JOptionPane.showMessageDialog(this.getRootPane(),
 						"A network must be selected for"
 								+ " which to update sensor range.");
-			} else
 
-			// Check the value validity.
-			if (newRangeText.equals("")) {
+			} else if (selectedNetwork != null) {
 
-				// Create dialog to inform user to enter info.
-				JOptionPane.showMessageDialog(this.getRootPane(),
-						"Enter sensor range to be set.");
-
-			} else {
+				// Check the value validity.
+				if (newRangeText.equals("")) {
+					// Create dialog to inform user to enter info.
+					JOptionPane.showMessageDialog(this.getRootPane(),
+							"Enter sensor range to be set.");
+					return;
+				}
 
 				float newRange = Float.parseFloat(newRangeText);
 
-				if (selectedNetwork != null
-						&& NetworkType.DIRECTIONAL.equals(selectedNetwork)) {
-					dirNet.updateDirRange(newRange);
-				} else if (selectedNetwork != null
-						&& NetworkType.OMNIDIRECTIONAL.equals(selectedNetwork)) {
-					omniNet.updateOmniRange(newRange);
+				if (NetworkType.DIRECTIONAL.equals(selectedNetwork)) {
+					drawGraph(dirNet.createNetwork(newRange));
+				} else if (NetworkType.OMNIDIRECTIONAL.equals(selectedNetwork)) {
+					drawGraph(omniNet.createNetwork(newRange));
 				}
-
-				// Repaint to reflect the changes made to the model.
-				canvas.update(canvas.getGraphics());
 			}
 
 		} else if ("resetSetup".equals(e.getActionCommand())) {
@@ -656,64 +651,61 @@ public class NetworkGUI extends JPanel implements ActionListener {
 
 			rangeUpdateTextField.setText("");
 
-			if (selectedNetwork != null
-					&& NetworkType.DIRECTIONAL.equals(selectedNetwork)) {
-				dirNet.setupLogicalNetwork();
-				drawGraph(dirNet.getLogicalNetwork());
-			} else if (selectedNetwork != null
-					&& NetworkType.OMNIDIRECTIONAL.equals(selectedNetwork)) {
-				omniNet.setupLogicalNetwork();
-				drawGraph(omniNet.getLogicalNetwork());
+			if (selectedNetwork != null) {
+				if (NetworkType.DIRECTIONAL.equals(selectedNetwork)) {
+					drawGraph(dirNet.createOptimalNetwork(true));
+				} else if (NetworkType.OMNIDIRECTIONAL.equals(selectedNetwork)) {
+					drawGraph(omniNet.createOptimalNetwork(true));
+				}
 			}
-
-			// Repaint to reflect the changes made to the model.
-			canvas.update(canvas.getGraphics());
 		}
 
 		// On any event we want to...
 		if (selectedNetwork != null
 				&& NetworkType.DIRECTIONAL.equals(selectedNetwork)) {
+
 			// Update the normal graph statistics.
-			averageAngleTextField.setText(numFormatter.format(dirNet
-					.getAverageAngle()));
-			averageRangeTextField.setText(numFormatter.format(dirNet
-					.getAverageRange()));
-			totalEnergyUseTextField.setText(numFormatter.format(dirNet
-					.getTotalEnergyUse() / 1000));
+			String fAvgAngle = numFormatter.format(dirNet.getAverageAngle());
+			String fAvgRange = numFormatter.format(dirNet.getAverageRange());
+			double totEnergy = dirNet.getTotalEnergyUse() / 1000;
+			averageAngleTextField.setText(fAvgAngle);
+			averageRangeTextField.setText(fAvgRange);
+			totalEnergyUseTextField.setText(numFormatter.format(totEnergy));
 
 			// Update the average shortest path values.
-			averageSPLTextField.setText(numFormatter.format(dirNet
-					.getAverageShortestPathLength()));
-			averageSPLHopsTextField.setText(numFormatter.format(dirNet
-					.getAverageShortestPathLengthHops()));
+			float ASPL = dirNet.getAverageShortestPathLength();
+			float ASPLH = dirNet.getAverageShortestPathLengthHops();
+			averageSPLTextField.setText(numFormatter.format(ASPL));
+			averageSPLHopsTextField.setText(numFormatter.format(ASPLH));
 
 			// Update the graph diameter.
-			graphDiameterTextField.setText(numFormatter.format(dirNet
-					.getDiameter()));
-			graphDiameterHopsTextField.setText(numFormatter.format(dirNet
-					.getDiameterHops()));
+			String fDiam = numFormatter.format(dirNet.getDiameter());
+			String fDiamHops = numFormatter.format(dirNet.getDiameterHops());
+			graphDiameterTextField.setText(fDiam);
+			graphDiameterHopsTextField.setText(fDiamHops);
 
 		} else if (selectedNetwork != null
 				&& NetworkType.OMNIDIRECTIONAL.equals(selectedNetwork)) {
+
 			// Update the normal graph statistics.
-			averageAngleTextField.setText(numFormatter.format(omniNet
-					.getAverageAngle()));
-			averageRangeTextField.setText(numFormatter.format(omniNet
-					.getAverageRange()));
-			totalEnergyUseTextField.setText(numFormatter.format(omniNet
-					.getTotalEnergyUse() / 1000));
+			String fAvgAngle = numFormatter.format(omniNet.getAverageAngle());
+			String fAvgRange = numFormatter.format(omniNet.getAverageRange());
+			double totEnergy = omniNet.getTotalEnergyUse() / 1000;
+			averageAngleTextField.setText(fAvgAngle);
+			averageRangeTextField.setText(fAvgRange);
+			totalEnergyUseTextField.setText(numFormatter.format(totEnergy));
 
 			// Update the average shortest path values.
-			averageSPLTextField.setText(numFormatter.format(omniNet
-					.getAverageShortestPathLength()));
-			averageSPLHopsTextField.setText(numFormatter.format(omniNet
-					.getAverageShortestPathLengthHops()));
+			float ASPL = omniNet.getAverageShortestPathLength();
+			float ASPLH = omniNet.getAverageShortestPathLengthHops();
+			averageSPLTextField.setText(numFormatter.format(ASPL));
+			averageSPLHopsTextField.setText(numFormatter.format(ASPLH));
 
 			// Update the graph diameter.
-			graphDiameterTextField.setText(numFormatter.format(omniNet
-					.getDiameter()));
-			graphDiameterHopsTextField.setText(numFormatter.format(omniNet
-					.getDiameterHops()));
+			String fDiam = numFormatter.format(omniNet.getDiameter());
+			String fDiamHops = numFormatter.format(omniNet.getDiameterHops());
+			graphDiameterTextField.setText(fDiam);
+			graphDiameterHopsTextField.setText(fDiamHops);
 		}
 
 	}
