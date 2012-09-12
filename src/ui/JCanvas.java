@@ -3,9 +3,9 @@ package ui;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.geom.AffineTransform;
-import java.util.HashSet;
+import java.util.ArrayList;
 import java.util.Iterator;
-import java.util.Set;
+import java.util.List;
 
 import javax.swing.JPanel;
 
@@ -17,9 +17,8 @@ import javax.swing.JPanel;
 class JCanvas extends JPanel {
 
 	private static final long serialVersionUID = 1L;
-	private Set<Drawable> components = new HashSet<Drawable>();
+	private List<Drawable> components = new ArrayList<Drawable>();
 
-	private AffineTransform baseTransform = null;
 	private AffineTransform canvasTransform = null;
 
 	/**
@@ -37,6 +36,7 @@ class JCanvas extends JPanel {
 	public void paintComponent(Graphics g) {
 		super.paintComponent(g);
 
+		AffineTransform baseTransform = null;
 		Graphics2D g2 = (Graphics2D) g;
 
 		// If we are drawing with a transformation then apply the transformation
@@ -66,11 +66,6 @@ class JCanvas extends JPanel {
 		}
 	}
 
-	@Deprecated
-	public AffineTransform getCanvasTransform() {
-		return canvasTransform;
-	}
-
 	/**
 	 * Set the transformation which is applied when drawing objects contained in
 	 * the canvas.
@@ -81,11 +76,6 @@ class JCanvas extends JPanel {
 	 */
 	public void setTransform(AffineTransform affineTransform) {
 		canvasTransform = affineTransform;
-	}
-
-	@Deprecated
-	public AffineTransform getOriginTransform() {
-		return baseTransform;
 	}
 
 	/**

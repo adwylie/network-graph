@@ -4,11 +4,11 @@ import java.awt.Color;
 import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.Font;
-import java.awt.Graphics2D;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.GridLayout;
 import java.awt.Insets;
+import java.awt.Point;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.geom.AffineTransform;
@@ -581,31 +581,20 @@ public class NetworkGUI extends JPanel implements ActionListener {
 			pathLengthHopsTextField.setText(numFormatter.format(sPathLenHops));
 			pathLengthTextField.setText(numFormatter.format(sPathLen));
 
-			// Get and draw the route itself.
-			// Paint over the canvas, but use its transform so we can draw
-			// at the correct spot.
+			// Create a drawable object to add to the canvas object.
 			if (sPath != null) {
-				// Get the current elements graphics object (main panel).
-				Graphics2D g = ((Graphics2D) getGraphics());
-				// Redraw it so that any old paths are erased.
-				update(g);
 
-				// Apply the transformation to change our basis to the
-				// canvas' basis.
-				g.transform(canvas.getCanvasTransform());
+				Polyline polyline = new Polyline();
+				polyline.setColor(Color.red);
 
 				// Draw the path.
-				for (int i = 0; i < sPath.size() - 1; i++) {
+				for (int i = 0; i < sPath.size(); i++) {
 					Sensor v = sPath.get(i);
-					Sensor u = sPath.get(i + 1);
-
-					g.setColor(Color.RED);
-					g.drawLine((int) v.getX(), (int) v.getY(), (int) u.getX(),
-							(int) u.getY());
+					Point vPoint = new Point((int) v.getX(), (int) v.getY());
+					polyline.add(vPoint);
 				}
 
-				// Revert to the original basis.
-				g.transform(canvas.getOriginTransform());
+				canvas.add(polyline);
 			}
 		}
 
