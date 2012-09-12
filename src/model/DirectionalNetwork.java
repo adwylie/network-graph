@@ -7,6 +7,11 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 
+/**
+ * @author Andrew Wylie <andrew.dale.wylie@gmail.com>
+ * @version 1.0
+ * @since 2012-09-12
+ */
 public class DirectionalNetwork extends Network {
 
 	int index = 0;
@@ -41,7 +46,7 @@ public class DirectionalNetwork extends Network {
 	}
 
 	/**
-	 * Create a network from the logical network which is fully optimal.
+	 * Create a network from the logical network which is optimal.
 	 * 
 	 * Sensors may have different ranges.
 	 * 

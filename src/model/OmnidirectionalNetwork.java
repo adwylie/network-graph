@@ -5,6 +5,11 @@ import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 
+/**
+ * @author Andrew Wylie <andrew.dale.wylie@gmail.com>
+ * @version 1.0
+ * @since 2012-09-12
+ */
 public class OmnidirectionalNetwork extends Network {
 
 	/**
@@ -37,7 +42,7 @@ public class OmnidirectionalNetwork extends Network {
 	}
 
 	/**
-	 * Create a network from the logical network which is fully optimal.
+	 * Create a network from the logical network which is optimal.
 	 * 
 	 * Sensors may have different ranges.
 	 * 

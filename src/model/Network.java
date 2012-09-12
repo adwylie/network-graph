@@ -7,6 +7,11 @@ import java.util.List;
 import algorithms.DijkstraSSSP;
 import algorithms.KruskalMST;
 
+/**
+ * @author Andrew Wylie <andrew.dale.wylie@gmail.com>
+ * @version 1.0
+ * @since 2012-09-12
+ */
 public abstract class Network {
 
 	protected WeightedGraph<Node, Link> physicalNetwork = null;
