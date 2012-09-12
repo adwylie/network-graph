@@ -106,7 +106,7 @@ public class OmnidirectionalNetwork extends Network {
 				Sensor v = vertsVIter.next();
 
 				// If the distance is less than the range then we add an edge.
-				if (getDistance(u, v) <= sensorRange && v != u) {
+				if (u.getDistance(v) <= sensorRange && v != u) {
 
 					Link newEdge = new Link(u.getName() + v.getName());
 					network.insertEdge(u, v, newEdge);

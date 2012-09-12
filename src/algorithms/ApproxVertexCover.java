@@ -6,7 +6,7 @@ import java.util.Set;
 
 import model.EdgeInterface;
 import model.Graph;
-import model.VertexInterface;
+import model.Vertex;
 
 // Algorithm from: Introduction to Algorithms, Third Edition; Cormen et al.
 // pg. 1109
@@ -25,7 +25,7 @@ import model.VertexInterface;
 
 // Returns a 2-approximation.
 
-public class ApproxVertexCover<V extends VertexInterface, E extends EdgeInterface> {
+public class ApproxVertexCover<V extends Vertex, E extends EdgeInterface> {
 
     private HashSet<V> vertexCoverVertices;
     private HashSet<E> vertexCoverEdges;

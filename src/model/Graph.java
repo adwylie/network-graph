@@ -20,7 +20,7 @@ import ui.Drawable;
  * @version 1.0
  * @since 2011-09-10
  */
-public class Graph<V extends VertexInterface, E extends EdgeInterface>
+public class Graph<V extends Vertex, E extends EdgeInterface>
 		implements GraphInterface<V, E>, Drawable {
 
 	// Vertex/Edge maps to each other.

@@ -11,7 +11,7 @@ import ui.Drawable;
  * @version 1.0
  * @since 2011-09-10
  */
-public class Node implements VertexInterface, Drawable {
+public class Node extends Vertex implements Drawable {
 
 	protected String name;
 	protected float x;

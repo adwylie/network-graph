@@ -7,7 +7,7 @@ import ui.Drawable;
  * @version 1.0
  * @since 2011-09-10
  */
-public class WeightedGraph<V extends VertexInterface, E extends WeightedEdgeInterface>
+public class WeightedGraph<V extends Vertex, E extends WeightedEdgeInterface>
 		extends Graph<V, E> implements Drawable {
 
 	@Override

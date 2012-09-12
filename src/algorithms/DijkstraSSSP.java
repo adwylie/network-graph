@@ -7,7 +7,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 
-import model.VertexInterface;
+import model.Vertex;
 import model.WeightedEdgeInterface;
 import model.WeightedGraph;
 
@@ -19,7 +19,7 @@ import model.WeightedGraph;
 // I'm tired. and just want to finish this assignment. this implementation is
 // going to be gruesome.
 
-public class DijkstraSSSP<V extends VertexInterface, E extends WeightedEdgeInterface> {
+public class DijkstraSSSP<V extends Vertex, E extends WeightedEdgeInterface> {
 
     // Variables!!!!
     private WeightedGraph<V, E> graph;

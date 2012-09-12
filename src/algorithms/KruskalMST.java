@@ -8,14 +8,14 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 
-import model.VertexInterface;
+import model.Vertex;
 import model.WeightedEdgeInterface;
 import model.WeightedGraph;
 
 // Algorithm from: Introduction to Algorithms, Third Edition; Cormen et al.
 // pg. 631
 
-public class KruskalMST<V extends VertexInterface, E extends WeightedEdgeInterface> {
+public class KruskalMST<V extends Vertex, E extends WeightedEdgeInterface> {
 
 	private WeightedGraph<V, E> MST;
 	private float MSTWeight;

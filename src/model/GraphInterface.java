@@ -2,7 +2,7 @@ package model;
 
 import java.util.Set;
 
-public interface GraphInterface<V extends VertexInterface, E extends EdgeInterface> {
+public interface GraphInterface<V extends Vertex, E extends EdgeInterface> {
 
 	/**
 	 * Return a Set of all the vertices in the graph.

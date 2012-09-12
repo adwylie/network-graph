@@ -101,7 +101,7 @@ public class DirectionalNetwork extends Network {
 				Sensor v = vertsVIter.next();
 
 				// If the distance is less than the range then we add an edge.
-				if (getDistance(u, v) <= sensorRange && v != u) {
+				if (u.getDistance(v) <= sensorRange && v != u) {
 
 					Link newEdge = new Link(u.getName() + v.getName());
 					network.insertEdge(u, v, newEdge);
@@ -174,13 +174,13 @@ public class DirectionalNetwork extends Network {
 			Sensor toSensor = toSensorsIter.next();
 
 			// Get the distance. Pythagorean Theorem.
-			float distance = getDistance(fromSensor, toSensor);
+			float distance = fromSensor.getDistance(toSensor);
 
 			if (distance > longestRange) {
 				longestRange = distance;
 			}
 
-			angles.add(getDirection(fromSensor, toSensor));
+			angles.add(fromSensor.getDirection(toSensor));
 		}
 
 		float direction = 0f;

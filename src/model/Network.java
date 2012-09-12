@@ -87,62 +87,6 @@ public abstract class Network {
 	}
 
 	/**
-	 * Get the direction vector from one sensor to another.
-	 * 
-	 * Find the direction vector from one sensor to another. The result is an
-	 * angle in degrees with respect to the polar coordinate system.
-	 * 
-	 * @param from
-	 *            a vertex.
-	 * @param to
-	 *            a vertex.
-	 * 
-	 * @return
-	 */
-	protected float getDirection(VertexInterface from, VertexInterface to) {
-
-		// Convert the vector 'fromVertex -> toVertex' to a point, by moving the
-		// vector (tail) to the origin.
-		float yPos = to.getY() - from.getY();
-		float xPos = to.getX() - from.getX();
-
-		// Then get the angle from the point by using polar coordinate formula.
-		float direction = (float) Math.atan2(yPos, xPos);
-
-		// Wikipedia: In both cases, the result is an angle in radians in the
-		// range (-Pi, Pi]. If desired an angle in the range [0, 2Pi) may be
-		// obtained by adding 2Pi to the value if it is negative.
-		if (direction < 0) {
-			direction += 2 * Math.PI;
-		}
-
-		// Convert from radians to degrees.
-		direction = (float) Math.toDegrees(direction);
-
-		return direction;
-	}
-
-	/**
-	 * Get the distance from one vertex to another.
-	 * 
-	 * @param from
-	 *            a vertex.
-	 * @param to
-	 *            a vertex.
-	 * 
-	 * @return the distance between vertices.
-	 */
-	protected float getDistance(VertexInterface from, VertexInterface to) {
-
-		// Get the distance, using the Pythagorean Theorem!
-		double xDistSquared = Math.pow((from.getX() - to.getX()), 2);
-		double yDistSquared = Math.pow((from.getY() - to.getY()), 2);
-		float distance = (float) Math.sqrt((xDistSquared + yDistSquared));
-
-		return distance;
-	}
-
-	/**
 	 * Get the diameter of the logical network graph, using euclidean distance.
 	 * 
 	 * @return the diameter of the logical network graph.
