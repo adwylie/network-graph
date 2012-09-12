@@ -38,6 +38,7 @@ import logging.FileLogger;
 import model.DirectionalNetwork;
 import model.GraphParser;
 import model.Link;
+import model.Network;
 import model.NetworkType;
 import model.Node;
 import model.OmnidirectionalNetwork;
@@ -541,7 +542,8 @@ public class NetworkGUI extends JPanel implements ActionListener {
 				JOptionPane.showMessageDialog(this.getRootPane(),
 						"A network must be selected for"
 								+ " which to find a path in.");
-			} else
+				return;
+			}
 
 			// Code for the shortest specified path button.
 			if (pathFromTextField.getText().equals("")
@@ -550,62 +552,62 @@ public class NetworkGUI extends JPanel implements ActionListener {
 				JOptionPane.showMessageDialog(this.getRootPane(),
 						"Enter sensor names to find"
 								+ " the shortest path between them.");
-			} else {
-				// Set up some temporary variables to prevent code repetition.
-				String fromText = pathFromTextField.getText();
-				String toText = pathToTextField.getText();
-				List<Sensor> sPath = null;
-				float sPathLen = 0f;
-				int sPathLenHops = 0;
+				return;
+			}
 
-				// Get the route length.
-				if (selectedNetwork != null
-						&& NetworkType.DIRECTIONAL.equals(selectedNetwork)) {
+			// Set up some temporary variables to prevent code repetition.
+			String fromText = pathFromTextField.getText();
+			String toText = pathToTextField.getText();
+			List<Sensor> sPath = null;
+			float sPathLen = 0f;
+			int sPathLenHops = 0;
 
-					sPathLenHops = dirNet.getShortestPathLengthHops(fromText,
-							toText);
-					sPathLen = dirNet.getShortestPathLength(fromText, toText);
-					sPath = dirNet.getShortestPath(fromText, toText);
+			// Get the route length.
+			if (selectedNetwork != null
+					&& NetworkType.DIRECTIONAL.equals(selectedNetwork)) {
 
-				} else if (selectedNetwork != null
-						&& NetworkType.OMNIDIRECTIONAL.equals(selectedNetwork)) {
+				sPathLenHops = dirNet.getShortestPathLengthHops(fromText,
+						toText);
+				sPathLen = dirNet.getShortestPathLength(fromText, toText);
+				sPath = dirNet.getShortestPath(fromText, toText);
 
-					sPathLenHops = omniNet.getShortestPathLengthHops(fromText,
-							toText);
-					sPathLen = omniNet.getShortestPathLength(fromText, toText);
-					sPath = omniNet.getShortestPath(fromText, toText);
+			} else if (selectedNetwork != null
+					&& NetworkType.OMNIDIRECTIONAL.equals(selectedNetwork)) {
+
+				sPathLenHops = omniNet.getShortestPathLengthHops(fromText,
+						toText);
+				sPathLen = omniNet.getShortestPathLength(fromText, toText);
+				sPath = omniNet.getShortestPath(fromText, toText);
+			}
+
+			pathLengthTextField.setText(numFormatter.format(sPathLen));
+			pathLengthHopsTextField.setText(numFormatter.format(sPathLenHops));
+
+			// Get and draw the route itself.
+			// Paint over the canvas, but use its transform so we can draw
+			// at the correct spot.
+			if (sPath != null) {
+				// Get the current elements graphics object (main panel).
+				Graphics2D g = ((Graphics2D) getGraphics());
+				// Redraw it so that any old paths are erased.
+				update(g);
+
+				// Apply the transformation to change our basis to the
+				// canvas' basis.
+				g.transform(canvas.getCanvasTransform());
+
+				// Draw the path.
+				for (int i = 0; i < sPath.size() - 1; i++) {
+					Sensor v = sPath.get(i);
+					Sensor u = sPath.get(i + 1);
+
+					g.setColor(Color.RED);
+					g.drawLine((int) v.getX(), (int) v.getY(), (int) u.getX(),
+							(int) u.getY());
 				}
 
-				pathLengthTextField.setText(numFormatter.format(sPathLen));
-				pathLengthHopsTextField.setText(numFormatter
-						.format(sPathLenHops));
-
-				// Get and draw the route itself.
-				// Paint over the canvas, but use its transform so we can draw
-				// at the correct spot.
-				if (sPath != null) {
-					// Get the current elements graphics object (main panel).
-					Graphics2D g = ((Graphics2D) getGraphics());
-					// Redraw it so that any old paths are erased.
-					update(g);
-
-					// Apply the transformation to change our basis to the
-					// canvas' basis.
-					g.transform(canvas.getCanvasTransform());
-
-					// Draw the path.
-					for (int i = 0; i < sPath.size() - 1; i++) {
-						Sensor v = sPath.get(i);
-						Sensor u = sPath.get(i + 1);
-
-						g.setColor(Color.RED);
-						g.drawLine((int) v.getX(), (int) v.getY(),
-								(int) u.getX(), (int) u.getY());
-					}
-
-					// Revert to the original basis.
-					g.transform(canvas.getOriginTransform());
-				}
+				// Revert to the original basis.
+				g.transform(canvas.getOriginTransform());
 			}
 		}
 
@@ -642,11 +644,13 @@ public class NetworkGUI extends JPanel implements ActionListener {
 			}
 
 		} else if ("resetSetup".equals(e.getActionCommand())) {
+
 			// There must be a network currently selected.
 			if (selectedNetwork == null) {
 				JOptionPane.showMessageDialog(this.getRootPane(),
 						"A network must be selected for"
 								+ " which to reset sensor range.");
+				return;
 			}
 
 			rangeUpdateTextField.setText("");
@@ -660,54 +664,39 @@ public class NetworkGUI extends JPanel implements ActionListener {
 			}
 		}
 
-		// On any event we want to...
-		if (selectedNetwork != null
-				&& NetworkType.DIRECTIONAL.equals(selectedNetwork)) {
-
-			// Update the normal graph statistics.
-			String fAvgAngle = numFormatter.format(dirNet.getAverageAngle());
-			String fAvgRange = numFormatter.format(dirNet.getAverageRange());
-			double totEnergy = dirNet.getTotalEnergyUse() / 1000;
-			averageAngleTextField.setText(fAvgAngle);
-			averageRangeTextField.setText(fAvgRange);
-			totalEnergyUseTextField.setText(numFormatter.format(totEnergy));
-
-			// Update the average shortest path values.
-			float ASPL = dirNet.getAverageShortestPathLength();
-			float ASPLH = dirNet.getAverageShortestPathLengthHops();
-			averageSPLTextField.setText(numFormatter.format(ASPL));
-			averageSPLHopsTextField.setText(numFormatter.format(ASPLH));
-
-			// Update the graph diameter.
-			String fDiam = numFormatter.format(dirNet.getDiameter());
-			String fDiamHops = numFormatter.format(dirNet.getDiameterHops());
-			graphDiameterTextField.setText(fDiam);
-			graphDiameterHopsTextField.setText(fDiamHops);
-
-		} else if (selectedNetwork != null
-				&& NetworkType.OMNIDIRECTIONAL.equals(selectedNetwork)) {
-
-			// Update the normal graph statistics.
-			String fAvgAngle = numFormatter.format(omniNet.getAverageAngle());
-			String fAvgRange = numFormatter.format(omniNet.getAverageRange());
-			double totEnergy = omniNet.getTotalEnergyUse() / 1000;
-			averageAngleTextField.setText(fAvgAngle);
-			averageRangeTextField.setText(fAvgRange);
-			totalEnergyUseTextField.setText(numFormatter.format(totEnergy));
-
-			// Update the average shortest path values.
-			float ASPL = omniNet.getAverageShortestPathLength();
-			float ASPLH = omniNet.getAverageShortestPathLengthHops();
-			averageSPLTextField.setText(numFormatter.format(ASPL));
-			averageSPLHopsTextField.setText(numFormatter.format(ASPLH));
-
-			// Update the graph diameter.
-			String fDiam = numFormatter.format(omniNet.getDiameter());
-			String fDiamHops = numFormatter.format(omniNet.getDiameterHops());
-			graphDiameterTextField.setText(fDiam);
-			graphDiameterHopsTextField.setText(fDiamHops);
+		// On any event we want to update the network statistics.
+		if (selectedNetwork != null) {
+			if (NetworkType.DIRECTIONAL.equals(selectedNetwork)) {
+				updateUiStatistics(dirNet);
+			} else if (NetworkType.OMNIDIRECTIONAL.equals(selectedNetwork)) {
+				updateUiStatistics(omniNet);
+			}
 		}
 
+	}
+
+	// populate the ui fields with information about the current network
+	private void updateUiStatistics(Network network) {
+
+		// Update the normal graph statistics.
+		String fAvgAngle = numFormatter.format(network.getAverageAngle());
+		String fAvgRange = numFormatter.format(network.getAverageRange());
+		double totEnergy = network.getTotalEnergyUse() / 1000;
+		averageAngleTextField.setText(fAvgAngle);
+		averageRangeTextField.setText(fAvgRange);
+		totalEnergyUseTextField.setText(numFormatter.format(totEnergy));
+
+		// Update the average shortest path values.
+		float ASPL = network.getAverageShortestPathLength();
+		float ASPLH = network.getAverageShortestPathLengthHops();
+		averageSPLTextField.setText(numFormatter.format(ASPL));
+		averageSPLHopsTextField.setText(numFormatter.format(ASPLH));
+
+		// Update the graph diameter.
+		String fDiam = numFormatter.format(network.getDiameter());
+		String fDiamHops = numFormatter.format(network.getDiameterHops());
+		graphDiameterTextField.setText(fDiam);
+		graphDiameterHopsTextField.setText(fDiamHops);
 	}
 
 	// Redraw the input graph.
