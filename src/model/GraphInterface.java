@@ -64,26 +64,6 @@ public interface GraphInterface<V extends VertexInterface, E extends EdgeInterfa
 	boolean areAdjacent(V v, V u);
 
 	/**
-	 * Replace the element stored at vertex v with the object x.
-	 * 
-	 * @param vertex
-	 *            the vertex to be changed.
-	 * @param object
-	 *            the new object to store in the vertex.
-	 */
-	void replace(V vertex, Object object);
-
-	/**
-	 * Replace the element stored at edge e with the object x.
-	 * 
-	 * @param edge
-	 *            the edge to be changed.
-	 * @param object
-	 *            the new object to store in the vertex.
-	 */
-	void replace(E edge, Object object);
-
-	/**
 	 * Insert a new vertex in the graph and return it.
 	 * 
 	 * @param vertex

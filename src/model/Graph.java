@@ -104,16 +104,6 @@ public class Graph<V extends VertexInterface, E extends EdgeInterface>
 	}
 
 	@Override
-	public void replace(V v, Object x) {
-		// TODO Auto-generated method stub
-	}
-
-	@Override
-	public void replace(E e, Object x) {
-		// TODO Auto-generated method stub
-	}
-
-	@Override
 	public V insertVertex(V vertex) {
 
 		if (vertex == null) {
