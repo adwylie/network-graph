@@ -20,8 +20,8 @@ import ui.Drawable;
  * @version 1.0
  * @since 2011-09-10
  */
-public class Graph<V extends Vertex, E extends EdgeInterface>
-		implements GraphInterface<V, E>, Drawable {
+public class Graph<V extends Vertex, E extends EdgeInterface> implements
+		GraphInterface<V, E>, Drawable {
 
 	// Vertex/Edge maps to each other.
 	protected HashMap<E, Set<V>> edgesToVertices = new HashMap<E, Set<V>>();
@@ -293,4 +293,5 @@ public class Graph<V extends Vertex, E extends EdgeInterface>
 
 		return arrowTransformed;
 	}
+
 }
