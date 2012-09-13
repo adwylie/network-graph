@@ -13,10 +13,6 @@ import ui.Drawable;
  */
 public class Node extends Vertex implements Drawable {
 
-	protected String name;
-	protected float x;
-	protected float y;
-
 	/**
 	 * Constructor for a Node object.
 	 * 
@@ -31,21 +27,6 @@ public class Node extends Vertex implements Drawable {
 		this.x = x;
 		this.y = y;
 		this.name = name;
-	}
-
-	@Override
-	public float getX() {
-		return x;
-	}
-
-	@Override
-	public float getY() {
-		return y;
-	}
-
-	@Override
-	public String getName() {
-		return name;
 	}
 
 	@Override

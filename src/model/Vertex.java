@@ -2,26 +2,36 @@ package model;
 
 public abstract class Vertex {
 
+	protected String name;
+	protected float x;
+	protected float y;
+
 	/**
 	 * Get the x coordinate of the vertex.
 	 * 
 	 * @return the x coordinate of the vertex.
 	 */
-	abstract float getX();
+	public float getX() {
+		return x;
+	}
 
 	/**
 	 * Get the y coordinate of the vertex.
 	 * 
 	 * @return the y coordinate of the vertex.
 	 */
-	abstract float getY();
+	public float getY() {
+		return y;
+	}
 
 	/**
 	 * Get the name of the vertex.
 	 * 
 	 * @return the name of the vertex.
 	 */
-	abstract String getName();
+	public String getName() {
+		return name;
+	}
 
 	/**
 	 * Get the direction vector from this vertex to another.
@@ -65,7 +75,7 @@ public abstract class Vertex {
 	 * 
 	 * @return the distance between vertices.
 	 */
-	protected float getDistance(Vertex to) {
+	public float getDistance(Vertex to) {
 
 		// Get the distance, using the Pythagorean Theorem!
 		double xDistSquared = Math.pow((getX() - to.getX()), 2);
