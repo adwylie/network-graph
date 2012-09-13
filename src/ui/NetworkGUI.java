@@ -36,13 +36,15 @@ import javax.swing.UIManager;
 
 import logging.FileLogger;
 import model.DirectionalNetwork;
+import model.EdgeInterface;
+import model.Graph;
 import model.GraphParser;
 import model.Link;
 import model.Network;
 import model.NetworkType;
 import model.Node;
 import model.OmnidirectionalNetwork;
-import model.Sensor;
+import model.Vertex;
 import model.WeightedGraph;
 
 /**
@@ -86,9 +88,12 @@ public class NetworkGUI extends JPanel implements ActionListener {
 	private OmnidirectionalNetwork omniNet = null;
 	private NetworkType selectedNetwork = null;
 
+	// Keep the vertex type generic so we can draw both the physical network
+	// (Node) and a logical network (Sensor).
+	private WeightedGraph<? extends Vertex, Link> currentGraph = null;
+
 	public static void main(String[] args) {
-		// Schedule a job for the event-dispatching thread:
-		// creating and showing this application's GUI.
+		// Schedule a job for the event-dispatch thread to create & show the ui.
 		SwingUtilities.invokeLater(new Runnable() {
 			public void run() {
 				NetworkGUI.initializeGUI();
@@ -100,7 +105,6 @@ public class NetworkGUI extends JPanel implements ActionListener {
 
 		// Set the system look and feel.
 		try {
-			// Set System L&F
 			UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
 		} catch (Exception e) {
 			if (logging) {
@@ -147,7 +151,7 @@ public class NetworkGUI extends JPanel implements ActionListener {
 				BorderFactory.createEmptyBorder(5, 5, 5, 5)));
 
 		// /////////////////////////////////////////////////////////////////////
-		// ///////////// Draw Network Control Group ////////////////////
+		// ///////////// Draw Network Control Group ////////////////////////////
 		// /////////////////////////////////////////////////////////////////////
 
 		// In this group:
@@ -177,7 +181,7 @@ public class NetworkGUI extends JPanel implements ActionListener {
 				BorderFactory.createEmptyBorder(5, 5, 5, 5)));
 
 		// /////////////////////////////////////////////////////////////////////
-		// /////////////// Setup Control Group ////////////////////////
+		// /////////////// Setup Control Group /////////////////////////////////
 		// /////////////////////////////////////////////////////////////////////
 
 		// In this group:
@@ -227,12 +231,11 @@ public class NetworkGUI extends JPanel implements ActionListener {
 				BorderFactory.createEmptyBorder(5, 5, 5, 5)));
 
 		// /////////////////////////////////////////////////////////////////////
-		// ///////// Performance Control Group //////////////////
+		// ///////// Performance Control Group /////////////////////////////////
 		// /////////////////////////////////////////////////////////////////////
 
 		// In this group:
 		// shortest path (draw) & its length. given a -> b
-
 		// Length of a route
 
 		JButton pathButton = new JButton("Get Path");
@@ -319,7 +322,7 @@ public class NetworkGUI extends JPanel implements ActionListener {
 				BorderFactory.createEmptyBorder(5, 5, 5, 5)));
 
 		// /////////////////////////////////////////////////////////////////////
-		// ///////////////////// Statistics Control Group ///////////////////
+		// ///////////////////// Statistics Control Group //////////////////////
 		// /////////////////////////////////////////////////////////////////////
 
 		// In this group:
@@ -439,7 +442,7 @@ public class NetworkGUI extends JPanel implements ActionListener {
 				BorderFactory.createEmptyBorder(5, 5, 5, 5)));
 
 		// /////////////////////////////////////////////////////////////////////
-		// /////////////////// Options Control Group ////////////////////
+		// /////////////////// Options Control Group ///////////////////////////
 		// /////////////////////////////////////////////////////////////////////
 
 		// In this group:
@@ -459,7 +462,7 @@ public class NetworkGUI extends JPanel implements ActionListener {
 				BorderFactory.createEmptyBorder(5, 5, 5, 5)));
 
 		// /////////////////////////////////////////////////////////////////////
-		// ///////////////// OptionList Pane ///////////////////
+		// ///////////////// OptionList Pane ///////////////////////////////////
 		// /////////////////////////////////////////////////////////////////////
 
 		// Add all of the components to the main content pane.
@@ -504,9 +507,11 @@ public class NetworkGUI extends JPanel implements ActionListener {
 			// Draw the network on load if there is one selected.
 			if (selectedNetwork != null) {
 				if (NetworkType.DIRECTIONAL.equals(selectedNetwork)) {
-					drawGraph(dirNet.createOptimalNetwork(true));
+					currentGraph = dirNet.createOptimalNetwork(true);
+					drawGraph(currentGraph);
 				} else if (NetworkType.OMNIDIRECTIONAL.equals(selectedNetwork)) {
-					drawGraph(omniNet.createOptimalNetwork(true));
+					currentGraph = omniNet.createOptimalNetwork(true);
+					drawGraph(currentGraph);
 				}
 			}
 		}
@@ -514,20 +519,25 @@ public class NetworkGUI extends JPanel implements ActionListener {
 		// Draw a graph on the drawing action commands.
 		if ("drawDir".equals(e.getActionCommand())) {
 			if (dirNet != null) {
-				drawGraph(dirNet.createOptimalNetwork(true));
+				currentGraph = dirNet.createOptimalNetwork(true);
+				drawGraph(currentGraph);
 			}
-			// Keep track of which network is visible.
+			// Keep track of which network should be visible.
 			selectedNetwork = NetworkType.DIRECTIONAL;
 
-		} else if ("drawOmni".equals(e.getActionCommand())) {
+		}
+
+		// Draw a graph on the drawing action commands.
+		if ("drawOmni".equals(e.getActionCommand())) {
 			if (omniNet != null) {
-				drawGraph(omniNet.createOptimalNetwork(true));
+				currentGraph = omniNet.createOptimalNetwork(true);
+				drawGraph(currentGraph);
 			}
+			// Keep track of which network should be visible.
 			selectedNetwork = NetworkType.OMNIDIRECTIONAL;
 		}
 
-		// Make sure that a graph is loaded before any actual commands are
-		// available.
+		// A graph should be loaded before any actual commands are available.
 		if (dirNet == null || omniNet == null) {
 			JOptionPane.showMessageDialog(this.getRootPane(),
 					"You must load a network graph before analyzing it.");
@@ -555,41 +565,44 @@ public class NetworkGUI extends JPanel implements ActionListener {
 				return;
 			}
 
+			// Reset any path currently drawn.
+			drawGraph(currentGraph);
+
 			// Set up some temporary variables to prevent code repetition.
 			String from = pathFromTextField.getText();
 			String to = pathToTextField.getText();
-			int sPathLenHops = 0;
-			float sPathLen = 0f;
-			List<Sensor> sPath = null;
+			int splh = 0;
+			float spl = 0f;
+			List<? extends Vertex> sp = null;
 
 			// Get the route length.
 			if (selectedNetwork != null) {
 				if (NetworkType.DIRECTIONAL.equals(selectedNetwork)) {
 
-					sPathLenHops = dirNet.getShortestPathLengthHops(from, to);
-					sPathLen = dirNet.getShortestPathLength(from, to);
-					sPath = dirNet.getShortestPath(from, to);
+					splh = currentGraph.getShortestPathLengthHops(from, to);
+					spl = currentGraph.getShortestPathLength(from, to);
+					sp = currentGraph.getShortestPath(from, to);
 
 				} else if (NetworkType.OMNIDIRECTIONAL.equals(selectedNetwork)) {
 
-					sPathLenHops = omniNet.getShortestPathLengthHops(from, to);
-					sPathLen = omniNet.getShortestPathLength(from, to);
-					sPath = omniNet.getShortestPath(from, to);
+					splh = currentGraph.getShortestPathLengthHops(from, to);
+					spl = currentGraph.getShortestPathLength(from, to);
+					sp = currentGraph.getShortestPath(from, to);
 				}
 			}
 
-			pathLengthHopsTextField.setText(numFormatter.format(sPathLenHops));
-			pathLengthTextField.setText(numFormatter.format(sPathLen));
+			pathLengthHopsTextField.setText(numFormatter.format(splh));
+			pathLengthTextField.setText(numFormatter.format(spl));
 
 			// Create a drawable object to add to the canvas object.
-			if (sPath != null) {
+			if (sp != null) {
 
 				Polyline polyline = new Polyline();
 				polyline.setColor(Color.red);
 
 				// Draw the path.
-				for (int i = 0; i < sPath.size(); i++) {
-					Sensor v = sPath.get(i);
+				for (int i = 0; i < sp.size(); i++) {
+					Vertex v = sp.get(i);
 					Point vPoint = new Point((int) v.getX(), (int) v.getY());
 					polyline.add(vPoint);
 				}
@@ -610,8 +623,10 @@ public class NetworkGUI extends JPanel implements ActionListener {
 				JOptionPane.showMessageDialog(this.getRootPane(),
 						"A network must be selected for"
 								+ " which to update sensor range.");
+				return;
+			}
 
-			} else if (selectedNetwork != null) {
+			if (selectedNetwork != null) {
 
 				// Check the value validity.
 				if (newRangeText.equals("")) {
@@ -621,12 +636,15 @@ public class NetworkGUI extends JPanel implements ActionListener {
 					return;
 				}
 
+				// TODO exception handling
 				float newRange = Float.parseFloat(newRangeText);
 
 				if (NetworkType.DIRECTIONAL.equals(selectedNetwork)) {
-					drawGraph(dirNet.createNetwork(newRange));
+					currentGraph = dirNet.createNetwork(newRange);
+					drawGraph(currentGraph);
 				} else if (NetworkType.OMNIDIRECTIONAL.equals(selectedNetwork)) {
-					drawGraph(omniNet.createNetwork(newRange));
+					currentGraph = omniNet.createNetwork(newRange);
+					drawGraph(currentGraph);
 				}
 			}
 
@@ -644,9 +662,11 @@ public class NetworkGUI extends JPanel implements ActionListener {
 
 			if (selectedNetwork != null) {
 				if (NetworkType.DIRECTIONAL.equals(selectedNetwork)) {
-					drawGraph(dirNet.createOptimalNetwork(true));
+					currentGraph = dirNet.createOptimalNetwork(true);
+					drawGraph(currentGraph);
 				} else if (NetworkType.OMNIDIRECTIONAL.equals(selectedNetwork)) {
-					drawGraph(omniNet.createOptimalNetwork(true));
+					currentGraph = omniNet.createOptimalNetwork(true);
+					drawGraph(currentGraph);
 				}
 			}
 		}
@@ -654,40 +674,41 @@ public class NetworkGUI extends JPanel implements ActionListener {
 		// On any event we want to update the network statistics.
 		if (selectedNetwork != null) {
 			if (NetworkType.DIRECTIONAL.equals(selectedNetwork)) {
-				updateUiStatistics(dirNet);
+				updateUiStatistics(dirNet, currentGraph);
 			} else if (NetworkType.OMNIDIRECTIONAL.equals(selectedNetwork)) {
-				updateUiStatistics(omniNet);
+				updateUiStatistics(omniNet, currentGraph);
 			}
 		}
 
 	}
 
 	// populate the ui fields with information about the current network
-	private void updateUiStatistics(Network network) {
+	private void updateUiStatistics(Network net,
+			WeightedGraph<? extends Vertex, Link> wg) {
 
 		// Update the normal graph statistics.
-		String fAvgAngle = numFormatter.format(network.getAverageAngle());
-		String fAvgRange = numFormatter.format(network.getAverageRange());
-		double totEnergy = network.getTotalEnergyUse() / 1000;
+		String fAvgAngle = numFormatter.format(net.getAverageAngle());
+		String fAvgRange = numFormatter.format(net.getAverageRange());
+		double totEnergy = net.getTotalEnergyUse() / 1000;
 		averageAngleTextField.setText(fAvgAngle);
 		averageRangeTextField.setText(fAvgRange);
 		totalEnergyUseTextField.setText(numFormatter.format(totEnergy));
 
 		// Update the average shortest path values.
-		float ASPL = network.getAverageShortestPathLength();
-		float ASPLH = network.getAverageShortestPathLengthHops();
+		float ASPL = wg.getAverageShortestPathLength();
+		float ASPLH = wg.getAverageShortestPathLengthHops();
 		averageSPLTextField.setText(numFormatter.format(ASPL));
 		averageSPLHopsTextField.setText(numFormatter.format(ASPLH));
 
 		// Update the graph diameter.
-		String fDiam = numFormatter.format(network.getDiameter());
-		String fDiamHops = numFormatter.format(network.getDiameterHops());
+		String fDiam = numFormatter.format(wg.getDiameter());
+		String fDiamHops = numFormatter.format(wg.getDiameterHops());
 		graphDiameterTextField.setText(fDiam);
 		graphDiameterHopsTextField.setText(fDiamHops);
 	}
 
 	// Redraw the input graph.
-	private void drawGraph(WeightedGraph<Sensor, Link> g) {
+	private void drawGraph(Graph<? extends Vertex, ? extends EdgeInterface> g) {
 		canvas.clear();
 		canvas.add(g);
 	}
