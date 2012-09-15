@@ -21,11 +21,10 @@ import model.WeightedGraph;
 
 public class DijkstraSSSP<V extends Vertex, E extends WeightedEdgeInterface> {
 
-	// Variables!!!!
 	private WeightedGraph<V, E> graph;
 	private V source;
 
-	private Hashtable<V, V> optimalPrevious;
+	private Hashtable<V, V> optimalPrevious = new Hashtable<V, V>();
 
 	private ArrayList<V> currentPathVerts;
 	private ArrayList<E> currentPathEdges;
@@ -35,17 +34,19 @@ public class DijkstraSSSP<V extends Vertex, E extends WeightedEdgeInterface> {
 
 		this.graph = graph;
 		this.source = source;
-		this.optimalPrevious = new Hashtable<V, V>();
 
-		HashSet<V> vertices = new HashSet<V>();
-		vertices.addAll(this.graph.vertices());
+		runAlgorithm();
+	}
 
-		Hashtable<V, Float> distanceVals = new Hashtable<V, Float>();
+	private void runAlgorithm() {
 
 		// Check the query is valid.
-		if (!vertices.contains(this.source)) {
+		if (!graph.vertices().contains(source)) {
 			return;
 		}
+
+		HashSet<V> vertices = new HashSet<V>(graph.vertices());
+		Hashtable<V, Float> distanceVals = new Hashtable<V, Float>();
 
 		// Initialize the distance & previous node.
 		Iterator<V> verticesIter = vertices.iterator();
@@ -55,7 +56,7 @@ public class DijkstraSSSP<V extends Vertex, E extends WeightedEdgeInterface> {
 			// optimalPrevious.put(v, null);
 		}
 
-		distanceVals.put(this.source, 0f);
+		distanceVals.put(source, 0f);
 
 		while (!vertices.isEmpty()) {
 			// Get vertex with smallest distance in distanceVals.
@@ -81,10 +82,9 @@ public class DijkstraSSSP<V extends Vertex, E extends WeightedEdgeInterface> {
 
 			// Get the neighbors of closest.
 			HashSet<V> neighbors = new HashSet<V>();
-			Iterator<E> edges = this.graph.incidentEdges(closest).iterator();
+			Iterator<E> edges = graph.incidentEdges(closest).iterator();
 			while (edges.hasNext()) {
-				Iterator<V> verts = this.graph.endVertices(edges.next())
-						.iterator();
+				Iterator<V> verts = graph.endVertices(edges.next()).iterator();
 				while (verts.hasNext()) {
 					V v = verts.next();
 					if (v != closest) {
@@ -100,8 +100,8 @@ public class DijkstraSSSP<V extends Vertex, E extends WeightedEdgeInterface> {
 				float alt = distanceVals.get(closest);
 
 				// Get distance between closest and neighbor.
-				Set<E> vEdges = this.graph.incidentEdges(closest);
-				Set<E> uEdges = this.graph.incidentEdges(neighbor);
+				Set<E> vEdges = graph.incidentEdges(closest);
+				Set<E> uEdges = graph.incidentEdges(neighbor);
 
 				Iterator<E> iter = vEdges.iterator();
 
@@ -115,27 +115,22 @@ public class DijkstraSSSP<V extends Vertex, E extends WeightedEdgeInterface> {
 				// Determine whether or not to relax.
 				if (alt < distanceVals.get(neighbor)) {
 					distanceVals.put(neighbor, alt);
-					this.optimalPrevious.put(neighbor, closest);
+					optimalPrevious.put(neighbor, closest);
 				}
 			}
 
 		}
-
 	}
 
-	public void generatePath(V source, V to) {
-		// Check that we have a valid query.
-		if (source != this.source) {
-			return;
-		}
+	public void generatePath(V to) {
 
-		this.currentPathVerts = new ArrayList<V>();
-		this.currentPathEdges = new ArrayList<E>();
-		this.currentPathLength = 0f;
+		currentPathVerts = new ArrayList<V>();
+		currentPathEdges = new ArrayList<E>();
+		currentPathLength = 0f;
 
 		// If the path is from a vertex to itself...
 		if (source == to) {
-			this.currentPathVerts.add(source);
+			currentPathVerts.add(source);
 			return;
 		}
 
@@ -155,16 +150,16 @@ public class DijkstraSSSP<V extends Vertex, E extends WeightedEdgeInterface> {
 
 		// Path is found in reverse order. Invert it.
 		for (int i = tempPath.size() - 1; i >= 0; i--) {
-			this.currentPathVerts.add(tempPath.get(i));
+			currentPathVerts.add(tempPath.get(i));
 		}
 
 		// From the path of vertices generate the edge path.
-		for (int i = 0; i < this.currentPathVerts.size() - 1; i++) {
-			V v = this.currentPathVerts.get(i);
-			V u = this.currentPathVerts.get(i + 1);
+		for (int i = 0; i < currentPathVerts.size() - 1; i++) {
+			V v = currentPathVerts.get(i);
+			V u = currentPathVerts.get(i + 1);
 
-			Set<E> vEdges = this.graph.incidentEdges(v);
-			Set<E> uEdges = this.graph.incidentEdges(u);
+			Set<E> vEdges = graph.incidentEdges(v);
+			Set<E> uEdges = graph.incidentEdges(u);
 
 			Iterator<E> iter = vEdges.iterator();
 
@@ -176,24 +171,34 @@ public class DijkstraSSSP<V extends Vertex, E extends WeightedEdgeInterface> {
 				// if (uEdges.contains(e) &&
 				// e.getName().equals(v.getName() + u.getName())) {
 				if (uEdges.contains(e)) {
-					this.currentPathEdges.add(e);
-					this.currentPathLength += e.getWeight();
+					currentPathEdges.add(e);
+					currentPathLength += e.getWeight();
 				}
 			}
 		}
+	}
 
+	@Deprecated
+	public void generatePath(V source, V to) {
+
+		// Check that we have a valid query.
+		if (source != this.source) {
+			return;
+		} else {
+			generatePath(to);
+		}
 	}
 
 	public List<V> getPathVerts() {
-		return this.currentPathVerts;
+		return currentPathVerts;
 	}
 
 	public List<E> getPathEdges() {
-		return this.currentPathEdges;
+		return currentPathEdges;
 	}
 
 	public float getPathLength() {
-		return this.currentPathLength;
+		return currentPathLength;
 	}
 
 }
