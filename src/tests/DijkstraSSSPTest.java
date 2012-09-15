@@ -60,7 +60,7 @@ public class DijkstraSSSPTest {
 
 		DijkstraSSSP<Sensor, Link> sssp;
 		sssp = new DijkstraSSSP<Sensor, Link>(logicalNet, expectedV.get(0));
-		sssp.generatePath(expectedV.get(0), expectedV.get(1));
+		sssp.generatePath(expectedV.get(1));
 
 		assertEquals(expectedV, sssp.getPathVerts());
 
@@ -97,7 +97,7 @@ public class DijkstraSSSPTest {
 		ArrayList<Link> path = new ArrayList<Link>();
 
 		// a -> d
-		sssp.generatePath(a, d);
+		sssp.generatePath(d);
 
 		path.add(AD);
 		assertEquals(path, sssp.getPathEdges());
@@ -105,7 +105,7 @@ public class DijkstraSSSPTest {
 		path.clear();
 
 		// a -> c
-		sssp.generatePath(a, c);
+		sssp.generatePath(c);
 
 		path.add(AB);
 		path.add(BC);
@@ -114,7 +114,7 @@ public class DijkstraSSSPTest {
 		path.clear();
 
 		// a -> b
-		sssp.generatePath(a, b);
+		sssp.generatePath(b);
 
 		path.add(AB);
 		assertEquals(path, sssp.getPathEdges());

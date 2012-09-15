@@ -177,17 +177,6 @@ public class DijkstraSSSP<V extends Vertex, E extends WeightedEdgeInterface> {
 		}
 	}
 
-	@Deprecated
-	public void generatePath(V source, V to) {
-
-		// Check that we have a valid query.
-		if (source != this.source) {
-			return;
-		} else {
-			generatePath(to);
-		}
-	}
-
 	public List<V> getPathVerts() {
 		return currentPathVerts;
 	}
