@@ -13,8 +13,19 @@ import model.WeightedEdgeInterface;
 import model.WeightedGraph;
 
 /**
- * Algorithm from: Introduction to Algorithms, Third Edition; Cormen et al. pg.
- * 658 http://en.wikipedia.org/wiki/Dijkstra%27s_algorithm
+ * <p>
+ * This class is an implementation of Dijkstra's single source shortest path
+ * (SSSP) algorithm. The algorithm solves the SSSP on a weighted directed graph
+ * for which edge weights are non-negative.
+ * </p>
+ * <p>
+ * For more information on the algorith itself, please see:
+ * </p>
+ * <p>
+ * Cormen et al. (2009). Single-Source Shortest Paths. <i>Introduction to
+ * Algorithms, Third Edition</i>. (pp. 658-662). Cambridge, Massachusetts. The
+ * MIT Press.
+ * </p>
  * 
  * @author Andrew Wylie <andrew.dale.wylie@gmail.com>
  * @version 1.0
@@ -27,30 +38,16 @@ public class DijkstraSSSP<V extends Vertex, E extends WeightedEdgeInterface> {
 	private V source;
 
 	// Fields used to create the sssp.
-	private PriorityQueue<V> vertices;
 	private HashMap<V, V> predecessor = new HashMap<V, V>();
 	private HashMap<V, Float> distance = new HashMap<V, Float>();
 
 	// Fields used to hold current generated path properties.
 	private ArrayList<V> currentPathVerts;
 	private ArrayList<E> currentPathEdges;
-	private float currentPathLength;
-
-	public DijkstraSSSP(WeightedGraph<V, E> graph, V source) {
-
-		this.graph = graph;
-		this.source = source;
-
-		// Check the query is valid.
-		if (!graph.vertices().contains(source)) {
-			return;
-		}
-
-		dijkstra();
-	}
+	private float currentPathWeight;
 
 	// Allow the priority queue to be keyed by vertex distance values.
-	class VComparator implements Comparator<V> {
+	private class VComparator implements Comparator<V> {
 
 		@Override
 		public int compare(V o1, V o2) {
@@ -67,7 +64,33 @@ public class DijkstraSSSP<V extends Vertex, E extends WeightedEdgeInterface> {
 		}
 	}
 
-	// Initialize the distance & previous node quantities for each vertex.
+	/**
+	 * Create a Dijkstra's single source shortest path algorithm instance from
+	 * the input graph and source vertex.
+	 * 
+	 * @param graph
+	 *            a directed weighed graph to use for Dijkstra's algorithm.
+	 * @param source
+	 *            the source vertex to use for Dijkstra's algorithm.
+	 */
+	public DijkstraSSSP(WeightedGraph<V, E> graph, V source) {
+
+		this.graph = graph;
+		this.source = source;
+
+		// Check the query is valid.
+		if (!graph.vertices().contains(source)) {
+			return;
+		}
+
+		// Calculate the vertex distances & predecessors.
+		// Basically we just run the algorithm.
+		dijkstra();
+	}
+
+	/**
+	 * Initialize the distance & previous node quantities for each vertex.
+	 */
 	private void initializeSingleSource() {
 
 		Iterator<V> verticesIter = graph.vertices().iterator();
@@ -83,7 +106,19 @@ public class DijkstraSSSP<V extends Vertex, E extends WeightedEdgeInterface> {
 		distance.put(source, 0f);
 	}
 
-	// Relax an edge; w is the weight of edge u -> v.
+	/**
+	 * Relax an edge.
+	 * 
+	 * The edge to be relaxed has weight w, and is defined as the directed edge
+	 * from vertex u to vertex v.
+	 * 
+	 * @param u
+	 *            the 'from' vertex for the edge which is to be relaxed.
+	 * @param v
+	 *            the 'to' vertex for the edge which is to be relaxed.
+	 * @param w
+	 *            the weight of the edge connecting vertices u and v.
+	 */
 	private void relax(V u, V v, float w) {
 
 		if (distance.get(v) > (distance.get(u) + w)) {
@@ -93,15 +128,24 @@ public class DijkstraSSSP<V extends Vertex, E extends WeightedEdgeInterface> {
 		}
 	}
 
-	//
+	/**
+	 * Run Dijkstra's algorithm on the graph with respect to the source vertex.
+	 * 
+	 * This method calculates the correct distance and predecessor values for
+	 * all vertices in the graph.
+	 */
 	private void dijkstra() {
 
 		initializeSingleSource();
 
 		// There isn't a priority queue constructor that allows us to specify
 		// both a comparator and a collection. :(
+		PriorityQueue<V> vertices;
+
 		int pqInitialCapacity = graph.vertices().size();
-		vertices = new PriorityQueue<V>(pqInitialCapacity, new VComparator());
+		Comparator<V> pqComparator = new VComparator();
+
+		vertices = new PriorityQueue<V>(pqInitialCapacity, pqComparator);
 		vertices.addAll(graph.vertices());
 
 		while (!vertices.isEmpty()) {
@@ -135,11 +179,23 @@ public class DijkstraSSSP<V extends Vertex, E extends WeightedEdgeInterface> {
 		}
 	}
 
+	/**
+	 * Generate a path from the source vertex to the input destination vertex.
+	 * 
+	 * This method populates the current path values for vertices, edges, and
+	 * the length of the path. The values can then be returned via the objects
+	 * getter methods.
+	 * 
+	 * @param destination
+	 *            a vertex to use as the destination for the shortest path from
+	 *            the source.
+	 */
 	public void generatePath(V destination) {
 
+		// Reset the path properties.
 		currentPathVerts = new ArrayList<V>();
 		currentPathEdges = new ArrayList<E>();
-		currentPathLength = 0f;
+		currentPathWeight = 0f;
 
 		// Calculate the path.
 		while (destination != null) {
@@ -171,22 +227,37 @@ public class DijkstraSSSP<V extends Vertex, E extends WeightedEdgeInterface> {
 
 				if (from.equals(v) && to.equals(u)) {
 					currentPathEdges.add(e);
-					currentPathLength += e.getWeight();
+					currentPathWeight += e.getWeight();
 				}
 			}
 		}
 	}
 
+	/**
+	 * Get a list of the vertices on the current shortest path.
+	 * 
+	 * @return a List of the vertices on the current shortest path.
+	 */
 	public List<V> getPathVerts() {
 		return currentPathVerts;
 	}
 
+	/**
+	 * Get a list of the edges on the current shortest path.
+	 * 
+	 * @return a List of the edges on the current shortest path.
+	 */
 	public List<E> getPathEdges() {
 		return currentPathEdges;
 	}
 
-	public float getPathLength() {
-		return currentPathLength;
+	/**
+	 * Get the weight of the current shortest path.
+	 * 
+	 * @return the weight of the current shortest path.
+	 */
+	public float getPathWeight() {
+		return currentPathWeight;
 	}
 
 }

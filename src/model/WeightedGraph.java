@@ -65,8 +65,8 @@ public class WeightedGraph<V extends Vertex, E extends WeightedEdgeInterface>
 				V v = inner.next();
 				sssp.generatePath(v);
 
-				if (sssp.getPathLength() > longestMinPath) {
-					longestMinPath = sssp.getPathLength();
+				if (sssp.getPathWeight() > longestMinPath) {
+					longestMinPath = sssp.getPathWeight();
 				}
 			}
 		}
@@ -131,7 +131,7 @@ public class WeightedGraph<V extends Vertex, E extends WeightedEdgeInterface>
 		DijkstraSSSP<V, E> sssp = new DijkstraSSSP<V, E>(this, u);
 		sssp.generatePath(v);
 
-		return sssp.getPathLength();
+		return sssp.getPathWeight();
 	}
 
 	public float getShortestPathLength(String u, String v) {
@@ -282,7 +282,7 @@ public class WeightedGraph<V extends Vertex, E extends WeightedEdgeInterface>
 
 				sssp.generatePath(v);
 
-				averageMinPath += sssp.getPathLength();
+				averageMinPath += sssp.getPathWeight();
 				count++;
 			}
 		}

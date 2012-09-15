@@ -67,7 +67,7 @@ public class DijkstraSSSPTest {
 		assertEquals(1, sssp.getPathEdges().size());
 		assertEquals(expectedE, sssp.getPathEdges().get(0));
 
-		assertEquals(4f, sssp.getPathLength(), 0f);
+		assertEquals(4f, sssp.getPathWeight(), 0f);
 	}
 
 	@Test
@@ -101,7 +101,7 @@ public class DijkstraSSSPTest {
 
 		path.add(AD);
 		assertEquals(path, sssp.getPathEdges());
-		assertEquals(8.5f, sssp.getPathLength(), 0.3f);
+		assertEquals(8.5f, sssp.getPathWeight(), 0.3f);
 		path.clear();
 
 		// a -> c
@@ -110,7 +110,7 @@ public class DijkstraSSSPTest {
 		path.add(AB);
 		path.add(BC);
 		assertEquals(path, sssp.getPathEdges());
-		assertEquals(12f, sssp.getPathLength(), 0f);
+		assertEquals(12f, sssp.getPathWeight(), 0f);
 		path.clear();
 
 		// a -> b
@@ -118,7 +118,7 @@ public class DijkstraSSSPTest {
 
 		path.add(AB);
 		assertEquals(path, sssp.getPathEdges());
-		assertEquals(4f, sssp.getPathLength(), 0f);
+		assertEquals(4f, sssp.getPathWeight(), 0f);
 		path.clear();
 
 	}
