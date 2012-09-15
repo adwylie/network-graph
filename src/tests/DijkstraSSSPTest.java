@@ -45,17 +45,21 @@ public class DijkstraSSSPTest {
 
 		// Run the orientation algorithm.
 		DirectionalNetwork dirNet = new DirectionalNetwork(pn);
-
-		WeightedGraph<Sensor, Link> logicalNetwork;
-		logicalNetwork = dirNet.getLogicalNetwork();
+		WeightedGraph<Sensor, Link> logicalNet = dirNet.getLogicalNetwork();
 
 		// The graph only has one edge.
-		Link expectedE = logicalNetwork.edges().iterator().next();
+		Link expectedE = logicalNet.edges().iterator().next();
 		ArrayList<Sensor> expectedV;
-		expectedV = new ArrayList<Sensor>(logicalNetwork.vertices());
+		expectedV = new ArrayList<Sensor>(logicalNet.vertices());
+
+		// Since the graph vertices() returns a set, the created arraylist may
+		// be different. Correct the ordering.
+		if (expectedV.get(0).getName().equals("B")) {
+			expectedV.add(expectedV.remove(0));
+		}
 
 		DijkstraSSSP<Sensor, Link> sssp;
-		sssp = new DijkstraSSSP<Sensor, Link>(logicalNetwork, expectedV.get(0));
+		sssp = new DijkstraSSSP<Sensor, Link>(logicalNet, expectedV.get(0));
 		sssp.generatePath(expectedV.get(0), expectedV.get(1));
 
 		assertEquals(expectedV, sssp.getPathVerts());
