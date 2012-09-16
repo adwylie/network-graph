@@ -41,7 +41,15 @@ public class Link implements WeightedEdgeInterface {
 	@Override
 	public int compareTo(WeightedEdgeInterface o) {
 
-		return (int) (getWeight() - o.getWeight());
+		float result = getWeight() - o.getWeight();
+
+		if (result > 0) {
+			return 1;
+		} else if (result < 0) {
+			return -1;
+		}
+
+		return 0;
 	}
 
 	@Override
