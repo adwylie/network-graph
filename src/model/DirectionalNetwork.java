@@ -134,7 +134,7 @@ public class DirectionalNetwork extends Network {
 				}
 			}
 
-			setSensorProps(sensor, connectedVertices, sensorRange);
+			setSensorProps(sensor, connectedVertices, sensorRange, true);
 		}
 		index = 0;
 
@@ -144,101 +144,178 @@ public class DirectionalNetwork extends Network {
 	// This function computes the direction and angle of a sensor. It is given
 	// the 'fromSensor' along with a set of 'toSensors'. It uses polar
 	// coordinates calculated and then sorted to locate the largest angle.
-	// The angle is then set at 360 - the largest angle, and directed towards
-	// the largest angle - 180 modulus 360.
-	// Although it is not used currently, the longest range needed is also
-	// calculated.
 	private void setSensorProps(Sensor fromSensor, Set<Sensor> toSensors,
-			float range) {
+			float range, boolean sameRange) {
 
-		// Find the angle needed using the toVertices positions.
-		ArrayList<Float> angles = new ArrayList<Float>();
-		Iterator<Sensor> toSensorsIter = toSensors.iterator();
-		float longestRange = 0f;
+		// If fromSensor doesn't connect to any other sensors, set default
+		// properties and return.
+		if (toSensors.size() == 0) {
 
-		// For each vertex, move it, then get the angle.
-		while (toSensorsIter.hasNext()) {
-			Sensor toSensor = toSensorsIter.next();
+			fromSensor.setAntennaType(AntennaType.DIRECTIONAL);
+			fromSensor.setAntennaDirection(0f);
+			fromSensor.setAntennaAngle(0f);
+			fromSensor.setAntennaRange(0f);
 
-			// Get the distance. Pythagorean Theorem.
-			float distance = fromSensor.getDistance(toSensor);
+			updateStats(fromSensor);
 
-			if (distance > longestRange) {
-				longestRange = distance;
-			}
-
-			angles.add(fromSensor.getDirection(toSensor));
+			return;
 		}
 
-		float direction = 0f;
-		float angle = 0f;
+		// Angles gives us a set of angles wrt/ the polar 0 degree position.
+		// From these we need to find the difference between each pair (in
+		// sorted order), so that we can find our desired angle, and from that
+		// the direction.
+		ArrayList<Float> angles = getAngles(fromSensor, toSensors);
+		float longestRange = getLongestRange(fromSensor, toSensors);
 
-		if (angles.size() > 0) {
-			// Sort the angles.
-			Collections.sort(angles);
+		Collections.sort(angles);
 
-			// Find the largest angle,
-			// Sensor angle is (360 - the largest difference between angles),
-			// Sensor direction is the
+		float largestAngle = -Float.MAX_VALUE;
+		int largestAngleIdx = Integer.MIN_VALUE;
 
-			float largestAngle = -1;
-			int largestAngleIdx = -1;
+		// So we're walking around the unit circle looking for the largest
+		// angle. First iteration we look at our first and last static angles.
+		// With angles 40 and 270 as an example, we'll get a negative angle;
+		// 40 - 270 = -230. So we correct this by adding 360 followed by a
+		// modulus 360 to get the actual angle; -230 + 360 = 130, which is the
+		// angle between polar coordinates 270 to 40.
+		int numAngles = angles.size();
 
-			for (int i = 0; i < angles.size(); i++) {
-				// Get the overlap condition first.
+		for (int i = 0; i < numAngles; i++) {
 
-				int lastAngleIdx = i - 1;
-				if (lastAngleIdx < 0) {
-					lastAngleIdx = angles.size() + lastAngleIdx;
-				}
+			// Get the overlap condition first.
+			int lastIdx = ((i - 1) + numAngles) % numAngles;
 
-				float tempAngle = angles.get(i) - angles.get(lastAngleIdx);
+			float angle = ((angles.get(i) - angles.get(lastIdx)) + 360) % 360;
 
-				// So we're walking around the circle looking for the largest
-				// angle. First iteration we look at our first and last points.
-				// Since we'll get a negative angle (modulus 360)
-				// (ie 270 - 40 = -230) we correct this by adding 360 to get
-				// the actual angle. (ie 360 - 270 + 40 = 130 = -230 + 360)
-				if (tempAngle < 0f) {
-					tempAngle += 360f;
-				}
-				if (tempAngle > largestAngle) {
-					largestAngle = tempAngle;
-					largestAngleIdx = i;
-				}
-			}
-
-			// If a vertex only connects to one node give it an angle which can
-			// be seen on the visualization/GUI.
-			angle = (largestAngle == 0f) ? 15f : (360f - largestAngle);
-
-			// Find the direction needed using the opposite vertices positions.
-			float angleCurrent = angles.get(largestAngleIdx);
-
-			int lastAngleIdx = largestAngleIdx - 1;
-			if (lastAngleIdx < 0) {
-				lastAngleIdx = angles.size() + lastAngleIdx;
-			}
-			float angleLast = angles.get(lastAngleIdx);
-
-			if (angleCurrent > angleLast) {
-				direction = (((angleCurrent + angleLast) / 2f) + 180f) % 360f;
-			} else {
-				// Largest angle lays across the last
-				// quadrant/first quadrant divide.
-				direction = ((angleCurrent + angleLast) / 2f) % 360f;
+			if (angle > largestAngle) {
+				largestAngle = angle;
+				largestAngleIdx = i;
 			}
 		}
+
+		// If a vertex only connects to one other vertex give it an angle which
+		// can be seen on the ui.
+		float angle = (largestAngle == 0f) ? 10f : (360f - largestAngle);
+
+		// Find the direction needed using the opposite vertices positions.
+		// So, after finding the largest angle, say 180 degress for example, we
+		// also know that it starts at 90 degrees mark and ends at 270 degrees
+		// mark. So, our direction will be 0 degrees (as the largest angle is
+		// the part that is removed from the sensor range).
+		float angleCurrent = angles.get(largestAngleIdx);
+		int lastAngleIdx = ((largestAngleIdx - 1) + numAngles) % numAngles;
+		float angleLast = angles.get(lastAngleIdx);
+
+		float direction = getDirection(angleLast, angleCurrent);
 
 		// Set the values.
 		fromSensor.setAntennaType(AntennaType.DIRECTIONAL);
 		fromSensor.setAntennaDirection(direction);
 		fromSensor.setAntennaAngle(angle);
-		fromSensor.setAntennaRange(range);
+		fromSensor.setAntennaRange(sameRange ? range : longestRange);
+
+		updateStats(fromSensor);
+	}
+
+	/**
+	 * Get a Set of the angles from a Sensor to all of a Set of sensors.
+	 * 
+	 * @param from
+	 *            the sensor to measure direction from.
+	 * @param to
+	 *            a Set of sensors to measure to.
+	 * 
+	 * @return a set of the angles from a sensor to all of a set of sensors.
+	 */
+	private ArrayList<Float> getAngles(Sensor from, Set<Sensor> to) {
+
+		ArrayList<Float> angles = new ArrayList<Float>();
+
+		Iterator<Sensor> toIter = to.iterator();
+
+		while (toIter.hasNext()) {
+
+			angles.add(from.getDirection(toIter.next()));
+		}
+
+		return angles;
+	}
+
+	/**
+	 * Get the longest range from a sensor to any of a set of sensors.
+	 * 
+	 * @param from
+	 *            the sensor to measure distance from.
+	 * @param to
+	 *            a Set of sensors to measure to.
+	 * 
+	 * @return the longest range from the sensor to any of a set of sensors.
+	 */
+	private float getLongestRange(Sensor from, Set<Sensor> to) {
+
+		float longestRange = -Float.MAX_VALUE;
+
+		Iterator<Sensor> toIter = to.iterator();
+
+		while (toIter.hasNext()) {
+
+			float distance = from.getDistance(toIter.next());
+
+			if (distance > longestRange) {
+
+				longestRange = distance;
+			}
+		}
+
+		return longestRange;
+	}
+
+	/**
+	 * Get the direction of a sensor.
+	 * 
+	 * The direction is found given two angles which make up the largest angle.
+	 * The angle at which the largest angle (between connected vertices) starts
+	 * is the start angle, and the angle at which the largest angle ends is the
+	 * end angle. The largest angle found between static angles is the
+	 * difference between these.
+	 * 
+	 * @param startAngle
+	 *            the static angle where the largest angle begins.
+	 * 
+	 * @param endAngle
+	 *            the static angle where the largest angle ends.
+	 * 
+	 * @return the direction of a sensor wrt/ the input static angles.
+	 */
+	private float getDirection(float startAngle, float endAngle) {
+
+		// Set the direction to initially be half way between the static angles.
+		float direction = ((endAngle + startAngle) / 2f);
+
+		// Add 180 degrees if the largest angle doesn't lay across the fourth
+		// quadrant -> first quadrant divide.
+		if (endAngle > startAngle) {
+			direction += 180f;
+		}
+
+		// Make sure the calculated direction is a valid degree value.
+		direction %= 360f;
+
+		return direction;
+	}
+
+	/**
+	 * Update the network statistics, using info from a newly set sensor.
+	 * 
+	 * @param setSensor
+	 *            the sensor whose properties were initialized/set.
+	 */
+	private void updateStats(Sensor setSensor) {
 
 		// Keep track of average angles & range.
-		float sensorAngle = fromSensor.getAntennaAngle();
-		float sensorRange = fromSensor.getAntennaRange();
+		float sensorAngle = setSensor.getAntennaAngle();
+		float sensorRange = setSensor.getAntennaRange();
 
 		double previousWeightedAngle = averageAngle * index / (index + 1);
 		double previousWeightedRange = averageRange * index / (index + 1);
