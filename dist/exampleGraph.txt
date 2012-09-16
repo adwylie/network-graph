@@ -10,11 +10,28 @@ NODE(I, 0, -175)
 NODE(J, 200, -150)
 
 EDGE(A, B)
+EDGE(B, A)
+
 EDGE(B, C)
+EDGE(C, B)
+
 EDGE(C, D)
+EDGE(D, C)
+
 EDGE(D, E)
+EDGE(E, D)
+
 EDGE(B, F)
+EDGE(F, B)
+
 EDGE(C, G)
+EDGE(G, C)
+
 EDGE(D, H)
+EDGE(H, D)
+
 EDGE(G, I)
+EDGE(I, G)
+
 EDGE(H, J)
+EDGE(J, H)
