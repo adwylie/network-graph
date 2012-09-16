@@ -121,30 +121,17 @@ public class DirectionalNetwork extends Network {
 			// outgoing edges. According to the edges we can then find the
 			// correct angle and distance.
 			Iterator<Link> edgeIter = network.incidentEdges(sensor).iterator();
-
-			Set<Link> outgoingEdges = new HashSet<Link>();
+			HashSet<Sensor> connectedVertices = new HashSet<Sensor>();
 
 			while (edgeIter.hasNext()) {
 				Link link = edgeIter.next();
 
-				// If the first end vertex (from) of the edge is the same as the
-				// sensor then we know we have an outgoing edge. So add it to
-				// the list.
+				// Only use outgoing edges.
 				if (network.endVertices(link).iterator().next().equals(sensor)) {
-					// TODO add iterator.next() to connectedVertices instead.
-					outgoingEdges.add(link);
+
+					Sensor s = network.opposite(sensor, link);
+					connectedVertices.add(s);
 				}
-			}
-
-			// Get the opposite vertices.
-			HashSet<Sensor> connectedVertices = new HashSet<Sensor>();
-			Iterator<Link> outgoingEdgesIter = outgoingEdges.iterator();
-
-			while (outgoingEdgesIter.hasNext()) {
-
-				Link link = outgoingEdgesIter.next();
-				Sensor s = network.opposite(sensor, link);
-				connectedVertices.add(s);
 			}
 
 			setSensorProps(sensor, connectedVertices, sensorRange);
