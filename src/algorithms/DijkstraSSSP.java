@@ -153,11 +153,6 @@ public class DijkstraSSSP<V extends Vertex, E extends WeightedEdgeInterface> {
 			// Get vertex with smallest distance to the source.
 			V u = vertices.poll();
 
-			// Check if the graph is disconnected.
-			// if (distance.get(u) == Float.MAX_VALUE) {
-			// break;
-			// }
-
 			// For each vertex adjacent to u (the closest vertex to source)
 			// relax the edge connecting them.
 			Iterator<E> edgesIter = graph.incidentEdges(u).iterator();
