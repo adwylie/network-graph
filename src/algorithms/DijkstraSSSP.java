@@ -19,7 +19,7 @@ import model.WeightedGraph;
  * for which edge weights are non-negative.
  * </p>
  * <p>
- * For more information on the algorith itself, please see:
+ * For more information on the algorithm itself, please see:
  * </p>
  * <p>
  * Cormen et al. (2009). Single-Source Shortest Paths. <i>Introduction to
