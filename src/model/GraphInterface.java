@@ -52,7 +52,10 @@ public interface GraphInterface<V extends Vertex, E extends EdgeInterface> {
 	V opposite(V vertex, E edge);
 
 	/**
-	 * Return whether two vertices are adjacent (connected by an edge).
+	 * Return whether two vertices are adjacent.
+	 * 
+	 * Two vertices are adjacent (v, u) if they are connected by a directed edge
+	 * from v to u.
 	 * 
 	 * @param v
 	 *            a vertex.

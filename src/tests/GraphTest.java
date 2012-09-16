@@ -163,8 +163,9 @@ public class GraphTest {
 		pn.insertEdge(b, c, BC);
 
 		assertEquals(true, pn.areAdjacent(a, b));
-		assertEquals(true, pn.areAdjacent(b, a));
-		assertEquals(true, pn.areAdjacent(c, b));
+		assertEquals(false, pn.areAdjacent(b, a));
+		assertEquals(true, pn.areAdjacent(b, c));
+		assertEquals(false, pn.areAdjacent(c, b));
 		assertEquals(false, pn.areAdjacent(a, c));
 		assertEquals(false, pn.areAdjacent(a, d));
 	}

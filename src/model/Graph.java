@@ -6,7 +6,6 @@ import java.awt.Graphics2D;
 import java.awt.Polygon;
 import java.awt.Shape;
 import java.awt.geom.AffineTransform;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -96,11 +95,21 @@ public class Graph<V extends Vertex, E extends EdgeInterface> implements
 			return false;
 		}
 
-		// Two vertices are adjacent if they share a common edge.
-		Set<E> vEdges = verticesToEdges.get(v);
-		Set<E> uEdges = verticesToEdges.get(u);
+		Iterator<E> vEdgeIter = verticesToEdges.get(v).iterator();
 
-		return !Collections.disjoint(vEdges, uEdges);
+		while (vEdgeIter.hasNext()) {
+
+			Iterator<V> endVertIter = endVertices(vEdgeIter.next()).iterator();
+
+			V from = endVertIter.next();
+			V to = endVertIter.next();
+
+			if (from.equals(v) && to.equals(u)) {
+				return true;
+			}
+		}
+
+		return false;
 	}
 
 	@Override
