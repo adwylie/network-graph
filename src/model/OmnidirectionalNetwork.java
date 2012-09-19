@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Set;
 
 /**
  * @author Andrew Wylie <andrew.dale.wylie@gmail.com>
@@ -53,13 +54,68 @@ public class OmnidirectionalNetwork extends Network {
 		resetStatistics();
 		WeightedGraph<Sensor, Link> network = new WeightedGraph<Sensor, Link>();
 
-		// Set the return network to be the same as the logical network.
+		// Add all vertices in the logical network to the new network.
+		Iterator<Sensor> verticesIter = logicalNetwork.vertices().iterator();
+
+		while (verticesIter.hasNext()) {
+			network.insertVertex(verticesIter.next());
+		}
 
 		// Set each sensor to have a range which is just large enough to reach
-		// all its connected vertices.
+		// all its connected sensors.
+		verticesIter = logicalNetwork.vertices().iterator();
+
+		while (verticesIter.hasNext()) {
+
+			float range = 0f;
+			Sensor v = verticesIter.next();
+			Set<Link> edges = logicalNetwork.incidentEdges(v);
+
+			Iterator<Link> edgesIter = edges.iterator();
+
+			while (edgesIter.hasNext()) {
+
+				Link e = edgesIter.next();
+
+				// Only use outgoing edges.
+				if (logicalNetwork.endVertices(e).iterator().next().equals(v)) {
+
+					float edgeWeight = e.getWeight();
+
+					if (edgeWeight >= range) {
+						range = edgeWeight;
+					}
+
+					// We have to connect all adjacent vertices anyway.
+					Sensor u = logicalNetwork.opposite(v, e);
+					Link link = new Link(v.getName() + u.getName());
+					network.insertEdge(v, u, link);
+
+				}
+			}
+
+			// Now we have the correct range to use, set it.
+			v.setAntennaType(AntennaType.OMNIDIRECTIONAL);
+			v.setAntennaRange(range);
+
+			// Double check; add any other connections to the graph which are
+			// covered by the sensor range.
+			Iterator<Sensor> vertsIter = logicalNetwork.vertices().iterator();
+
+			while (vertsIter.hasNext()) {
+
+				Sensor u = vertsIter.next();
+
+				if (v.getDistance(u) <= range && !network.areAdjacent(v, u)) {
+
+					Link link = new Link(v.getName() + u.getName());
+					network.insertEdge(v, u, link);
+				}
+			}
+
+		}
 
 		return network;
-
 	}
 
 	/**
@@ -108,8 +164,8 @@ public class OmnidirectionalNetwork extends Network {
 				// If the distance is less than the range then we add an edge.
 				if (u.getDistance(v) <= sensorRange && v != u) {
 
-					Link newEdge = new Link(u.getName() + v.getName());
-					network.insertEdge(u, v, newEdge);
+					Link link = new Link(u.getName() + v.getName());
+					network.insertEdge(u, v, link);
 				}
 			}
 
