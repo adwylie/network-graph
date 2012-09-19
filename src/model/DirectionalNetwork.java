@@ -83,7 +83,6 @@ public class DirectionalNetwork extends Network {
 		// Add edges which have the proper sensor range to the network.
 		Iterator<Sensor> vertsUIter = logicalNetwork.vertices().iterator();
 		Iterator<Sensor> vertsVIter;
-		index = 0;
 
 		// For every pair of vertices, if their distance is less than or equal
 		// to the new distance we want to create an edge between them. Only do
@@ -136,7 +135,6 @@ public class DirectionalNetwork extends Network {
 
 			setSensorProps(sensor, connectedVertices, sensorRange, true);
 		}
-		index = 0;
 
 		return network;
 	}
@@ -364,6 +362,7 @@ public class DirectionalNetwork extends Network {
 		averageAngle = 0;
 		averageRange = 0;
 		totalEnergyUse = 0;
+		index = 0;
 	}
 
 }
