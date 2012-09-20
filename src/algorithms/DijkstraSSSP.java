@@ -38,6 +38,7 @@ public class DijkstraSSSP<V extends Vertex, E extends WeightedEdgeInterface> {
 	private V source;
 
 	// Fields used to create the sssp.
+	private PriorityQueue<V> vertices;
 	private HashMap<V, V> predecessor = new HashMap<V, V>();
 	private HashMap<V, Float> distance = new HashMap<V, Float>();
 
@@ -123,8 +124,15 @@ public class DijkstraSSSP<V extends Vertex, E extends WeightedEdgeInterface> {
 
 		if (distance.get(v) > (distance.get(u) + w)) {
 
+			// The priority queue updates at time of insertion.
+			// So to update we remove objects, change them, and re-insert them.
+			// Anything that has distance updated.
+			vertices.remove(v);
+
 			distance.put(v, distance.get(u) + w);
 			predecessor.put(v, u);
+
+			vertices.add(v);
 		}
 	}
 
@@ -140,8 +148,6 @@ public class DijkstraSSSP<V extends Vertex, E extends WeightedEdgeInterface> {
 
 		// There isn't a priority queue constructor that allows us to specify
 		// both a comparator and a collection. :(
-		PriorityQueue<V> vertices;
-
 		int pqInitialCapacity = graph.vertices().size();
 		Comparator<V> pqComparator = new VComparator();
 
