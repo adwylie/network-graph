@@ -3,7 +3,7 @@ package model;
 import java.util.Hashtable;
 import java.util.Iterator;
 
-import algorithms.KruskalMST;
+import algorithms.PrimMST;
 
 /**
  * @author Andrew Wylie <andrew.dale.wylie@gmail.com>
@@ -13,7 +13,7 @@ import algorithms.KruskalMST;
 public abstract class Network {
 
 	protected WeightedGraph<Node, Link> physicalNetwork = null;
-	protected KruskalMST<Node, Link> physicalNetworkMst = null;
+	protected PrimMST<Node, Link> physicalNetworkMst = null;
 
 	/**
 	 * The logical network will always have the same graph structure, though
@@ -35,7 +35,7 @@ public abstract class Network {
 	public Network(WeightedGraph<Node, Link> physicalNetwork) {
 
 		this.physicalNetwork = physicalNetwork;
-		physicalNetworkMst = new KruskalMST<Node, Link>(physicalNetwork);
+		physicalNetworkMst = new PrimMST<Node, Link>(physicalNetwork);
 
 		initializeLogicalNetwork();
 	}
@@ -50,7 +50,7 @@ public abstract class Network {
 
 		Hashtable<Node, Sensor> nodesToSensors = new Hashtable<Node, Sensor>();
 
-		WeightedGraph<Node, Link> mstGraph = physicalNetworkMst.getMST();
+		WeightedGraph<Node, Link> mstGraph = physicalNetworkMst.getMst();
 
 		Iterator<Node> mstNodesIter = mstGraph.vertices().iterator();
 		Iterator<Link> mstLinksIter = mstGraph.edges().iterator();

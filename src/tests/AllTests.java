@@ -6,6 +6,6 @@ import org.junit.runners.Suite.SuiteClasses;
 
 @RunWith(Suite.class)
 @SuiteClasses({ ApproxVertexCoverTest.class, GraphTest.class,
-		KruskalMSTTest.class, WeightedGraphTest.class, DijkstraSSSPTest.class })
+		WeightedGraphTest.class, DijkstraSSSPTest.class })
 public class AllTests {
 }
