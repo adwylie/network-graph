@@ -178,8 +178,15 @@ public class PrimMST<V extends Vertex, E extends WeightedEdgeInterface> {
 					// the new weight we find is less than the current weight.
 					if (vertices.contains(v) && weight < key.get(v)) {
 
+						// The priority queue updates at time of insertion.
+						// So to update we remove objects, change them, and
+						// re-insert them. Anything that has key updated.
+						vertices.remove(v);
+
 						parent.put(v, u);
 						key.put(v, weight);
+
+						vertices.add(v);
 					}
 				}
 			}
