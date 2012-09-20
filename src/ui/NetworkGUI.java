@@ -242,6 +242,10 @@ public class NetworkGUI extends JPanel implements ActionListener {
 		pathButton.setActionCommand("getPath");
 		pathButton.addActionListener(this);
 
+		JButton resetPathButton = new JButton("Reset");
+		resetPathButton.setActionCommand("resetPath");
+		resetPathButton.addActionListener(this);
+
 		JLabel pathLabel = new JLabel("Get Shortest Path:");
 
 		JLabel pathFromLabel = new JLabel("From Node (name):");
@@ -316,6 +320,8 @@ public class NetworkGUI extends JPanel implements ActionListener {
 		c.gridwidth = 1;
 		c.gridy += 1;
 		performancePanel.add(pathButton, c);
+		c.gridx += 1;
+		performancePanel.add(resetPathButton, c);
 
 		performancePanel.setBorder(BorderFactory.createCompoundBorder(
 				BorderFactory.createTitledBorder("Performance"),
@@ -659,6 +665,29 @@ public class NetworkGUI extends JPanel implements ActionListener {
 			}
 
 			rangeUpdateTextField.setText("");
+
+			if (selectedNetwork != null) {
+				if (NetworkType.DIRECTIONAL.equals(selectedNetwork)) {
+					currentGraph = dirNet.createOptimalNetwork(true);
+					drawGraph(currentGraph);
+				} else if (NetworkType.OMNIDIRECTIONAL.equals(selectedNetwork)) {
+					currentGraph = omniNet.createOptimalNetwork(true);
+					drawGraph(currentGraph);
+				}
+			}
+		} else if ("resetPath".equals(e.getActionCommand())) {
+
+			// There must be a network currently selected.
+			if (selectedNetwork == null) {
+				JOptionPane.showMessageDialog(this.getRootPane(),
+						"A network must be selected for a path to be found.");
+				return;
+			}
+
+			pathFromTextField.setText("");
+			pathToTextField.setText("");
+			pathLengthTextField.setText("");
+			pathLengthHopsTextField.setText("");
 
 			if (selectedNetwork != null) {
 				if (NetworkType.DIRECTIONAL.equals(selectedNetwork)) {
