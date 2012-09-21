@@ -54,7 +54,82 @@ public class DirectionalNetwork extends Network {
 	 */
 	private WeightedGraph<Sensor, Link> createOptimalNetwork() {
 
-		return null;
+		resetStatistics();
+		WeightedGraph<Sensor, Link> network = new WeightedGraph<Sensor, Link>();
+
+		// Add all vertices in the logical network to the new network.
+		Iterator<Sensor> verticesIter = logicalNetwork.vertices().iterator();
+
+		while (verticesIter.hasNext()) {
+			network.insertVertex(verticesIter.next());
+		}
+
+		// For each vertex find the connected vertices. From them find the
+		// required sensor length (in the helper function).
+		verticesIter = logicalNetwork.vertices().iterator();
+
+		while (verticesIter.hasNext()) {
+
+			float range = 0f;
+			Sensor v = verticesIter.next();
+			Set<Link> edges = logicalNetwork.incidentEdges(v);
+			HashSet<Sensor> adjacentVerts = new HashSet<Sensor>();
+
+			Iterator<Link> edgeIter = edges.iterator();
+
+			while (edgeIter.hasNext()) {
+
+				Link e = edgeIter.next();
+
+				// Only count outgoing edges.
+				if (logicalNetwork.endVertices(e).iterator().next().equals(v)) {
+
+					float edgeWeight = e.getWeight();
+
+					if (edgeWeight >= range) {
+						range = edgeWeight;
+					}
+
+					// Add the adjacent vertex and connect the vertices.
+					Sensor u = logicalNetwork.opposite(v, e);
+					adjacentVerts.add(u);
+					Link link = new Link(v.getName() + u.getName());
+					network.insertEdge(v, u, link);
+				}
+			}
+
+			// Set up the part of the network wrt/ the current sensor.
+			setSensorProps(v, adjacentVerts, range);
+
+			// Now we catch the stragglers. For each vertex we need to check
+			// whether it is contained within another vertex's coverage area.
+			Iterator<Sensor> vertsIter = logicalNetwork.vertices().iterator();
+
+			while (vertsIter.hasNext()) {
+
+				Sensor u = vertsIter.next();
+
+				// The vertices have to be within range, and not adjacent.
+				if (v.getDistance(u) <= range && !network.areAdjacent(v, u)) {
+
+					// The u vertex must also be covered (directional sensor).
+					// Since the angle is centered on direction we want to half
+					// it when evaluating coverage when comparing direction.
+					float vDir = v.getAntennaDirection();
+					float vAngle = v.getAntennaAngle() / 2f;
+					float uDir = v.getDirection(u);
+
+					if ((((vDir - uDir + 360) % 360) <= vAngle)
+							|| (((uDir - vDir + 360) % 360) <= vAngle)) {
+
+						Link link = new Link(v.getName() + u.getName());
+						network.insertEdge(v, u, link);
+					}
+				}
+			}
+		}
+
+		return network;
 	}
 
 	/**
@@ -104,7 +179,6 @@ public class DirectionalNetwork extends Network {
 
 					Link newEdge = new Link(u.getName() + v.getName());
 					network.insertEdge(u, v, newEdge);
-
 				}
 			}
 		}
@@ -133,7 +207,7 @@ public class DirectionalNetwork extends Network {
 				}
 			}
 
-			setSensorProps(sensor, connectedVertices, sensorRange, true);
+			setSensorProps(sensor, connectedVertices, sensorRange);
 		}
 
 		return network;
@@ -143,7 +217,7 @@ public class DirectionalNetwork extends Network {
 	// the 'fromSensor' along with a set of 'toSensors'. It uses polar
 	// coordinates calculated and then sorted to locate the largest angle.
 	private void setSensorProps(Sensor fromSensor, Set<Sensor> toSensors,
-			float range, boolean sameRange) {
+			float range) {
 
 		// If fromSensor doesn't connect to any other sensors, set default
 		// properties and return.
@@ -164,7 +238,6 @@ public class DirectionalNetwork extends Network {
 		// sorted order), so that we can find our desired angle, and from that
 		// the direction.
 		ArrayList<Float> angles = getAngles(fromSensor, toSensors);
-		float longestRange = getLongestRange(fromSensor, toSensors);
 
 		Collections.sort(angles);
 
@@ -211,7 +284,7 @@ public class DirectionalNetwork extends Network {
 		fromSensor.setAntennaType(AntennaType.DIRECTIONAL);
 		fromSensor.setAntennaDirection(direction);
 		fromSensor.setAntennaAngle(angle);
-		fromSensor.setAntennaRange(sameRange ? range : longestRange);
+		fromSensor.setAntennaRange(range);
 
 		updateStats(fromSensor);
 	}
@@ -238,35 +311,6 @@ public class DirectionalNetwork extends Network {
 		}
 
 		return angles;
-	}
-
-	/**
-	 * Get the longest range from a sensor to any of a set of sensors.
-	 * 
-	 * @param from
-	 *            the sensor to measure distance from.
-	 * @param to
-	 *            a Set of sensors to measure to.
-	 * 
-	 * @return the longest range from the sensor to any of a set of sensors.
-	 */
-	private float getLongestRange(Sensor from, Set<Sensor> to) {
-
-		float longestRange = -Float.MAX_VALUE;
-
-		Iterator<Sensor> toIter = to.iterator();
-
-		while (toIter.hasNext()) {
-
-			float distance = from.getDistance(toIter.next());
-
-			if (distance > longestRange) {
-
-				longestRange = distance;
-			}
-		}
-
-		return longestRange;
 	}
 
 	/**
