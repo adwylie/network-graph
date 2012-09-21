@@ -13,6 +13,8 @@ import java.util.Set;
  */
 public class OmnidirectionalNetwork extends Network {
 
+	int index = 0;
+
 	/**
 	 * Constructor for a network.
 	 * 
@@ -97,6 +99,9 @@ public class OmnidirectionalNetwork extends Network {
 			v.setAntennaType(AntennaType.OMNIDIRECTIONAL);
 			v.setAntennaRange(range);
 
+			// Keep track of average angles & range.
+			updateStats(v);
+
 			// Double check; add any other connections to the graph which are
 			// covered by the sensor range.
 			Iterator<Sensor> vertsIter = logicalNetwork.vertices().iterator();
@@ -105,7 +110,8 @@ public class OmnidirectionalNetwork extends Network {
 
 				Sensor u = vertsIter.next();
 
-				if (v.getDistance(u) <= range && !network.areAdjacent(v, u)) {
+				if (v.getDistance(u) <= range && !v.equals(u)
+						&& !network.areAdjacent(v, u)) {
 
 					Link link = new Link(v.getName() + u.getName());
 					network.insertEdge(v, u, link);
@@ -142,7 +148,6 @@ public class OmnidirectionalNetwork extends Network {
 		// Add edges which have the proper sensor range to the network.
 		Iterator<Sensor> vertsUIter = logicalNetwork.vertices().iterator();
 		Iterator<Sensor> vertsVIter;
-		int index = 0;
 
 		// For every pair of vertices, if their distance is less than or equal
 		// to the new distance we want to create an edge between them. Only do
@@ -168,21 +173,7 @@ public class OmnidirectionalNetwork extends Network {
 			}
 
 			// Keep track of average angles & range.
-			float sensorAngle = u.getAntennaAngle();
-
-			double previousWeightedAngle = averageAngle * index / (index + 1);
-			double previousWeightedRange = averageRange * index / (index + 1);
-
-			double nextWeightedAngle = sensorAngle * 1 / (index + 1);
-			double nextWeightedRange = sensorRange * 1 / (index + 1);
-
-			averageAngle = previousWeightedAngle + nextWeightedAngle;
-			averageRange = previousWeightedRange + nextWeightedRange;
-
-			// Area = 1/2 r^2 angle.
-			totalEnergyUse += (0.5d * Math.pow(sensorRange, 2) * sensorAngle);
-
-			index++;
+			updateStats(u);
 		}
 
 		return network;
@@ -217,12 +208,40 @@ public class OmnidirectionalNetwork extends Network {
 	}
 
 	/**
+	 * Update the network statistics, using info from a newly set sensor.
+	 * 
+	 * @param setSensor
+	 *            the sensor whose properties were initialized/set.
+	 */
+	private void updateStats(Sensor setSensor) {
+
+		// Keep track of average angles & range.
+		float sensorAngle = setSensor.getAntennaAngle();
+		float sensorRange = setSensor.getAntennaRange();
+
+		double previousWeightedAngle = averageAngle * index / (index + 1);
+		double previousWeightedRange = averageRange * index / (index + 1);
+
+		double nextWeightedAngle = sensorAngle * 1 / (index + 1);
+		double nextWeightedRange = sensorRange * 1 / (index + 1);
+
+		averageAngle = previousWeightedAngle + nextWeightedAngle;
+		averageRange = previousWeightedRange + nextWeightedRange;
+
+		// Area = 1/2 r^2 angle.
+		totalEnergyUse += (0.5d * Math.pow(sensorRange, 2) * sensorAngle);
+
+		index++;
+	}
+
+	/**
 	 * Reset the variables used for statistics.
 	 */
 	private void resetStatistics() {
 		averageAngle = 0;
 		averageRange = 0;
 		totalEnergyUse = 0;
+		index = 0;
 	}
 
 }
