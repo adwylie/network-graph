@@ -90,7 +90,6 @@ public class OmnidirectionalNetwork extends Network {
 					Sensor u = logicalNetwork.opposite(v, e);
 					Link link = new Link(v.getName() + u.getName());
 					network.insertEdge(v, u, link);
-
 				}
 			}
 
@@ -112,7 +111,6 @@ public class OmnidirectionalNetwork extends Network {
 					network.insertEdge(v, u, link);
 				}
 			}
-
 		}
 
 		return network;
