@@ -95,11 +95,25 @@ public abstract class Network {
 	}
 
 	/**
+	 * Get the physical network MST.
+	 * 
+	 * @return a weighted graph of nodes and links, representing the physical
+	 *         network MST configuration.
+	 */
+	// TODO remove after completing changes to getLogicalNetwork()
+	@Deprecated
+	public WeightedGraph<Node, Link> getPhysicalNetworkMst() {
+		return physicalNetworkMst.getMst();
+	}
+
+	/**
 	 * Get the logical network.
 	 * 
 	 * @return a weighted graph of sensors and links, representing the logical
 	 *         network configuration.
 	 */
+	// TODO Sensors may have range & directions set by subclasses, reset them
+	// when returning the network.
 	public WeightedGraph<Sensor, Link> getLogicalNetwork() {
 		return logicalNetwork;
 	}
