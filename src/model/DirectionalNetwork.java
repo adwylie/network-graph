@@ -110,7 +110,8 @@ public class DirectionalNetwork extends Network {
 				Sensor u = vertsIter.next();
 
 				// The vertices have to be within range, and not adjacent.
-				if (v.getDistance(u) <= range && !network.areAdjacent(v, u)) {
+				if (v.getDistance(u) <= range && !v.equals(u)
+						&& !network.areAdjacent(v, u)) {
 
 					// The u vertex must also be covered (directional sensor).
 					// Since the angle is centered on direction we want to half
@@ -348,31 +349,6 @@ public class DirectionalNetwork extends Network {
 	}
 
 	/**
-	 * Update the network statistics, using info from a newly set sensor.
-	 * 
-	 * @param setSensor
-	 *            the sensor whose properties were initialized/set.
-	 */
-	private void updateStats(Sensor setSensor) {
-
-		// Keep track of average angles & range.
-		float sensorAngle = setSensor.getAntennaAngle();
-		float sensorRange = setSensor.getAntennaRange();
-
-		double previousWeightedAngle = averageAngle * index / (index + 1);
-		double previousWeightedRange = averageRange * index / (index + 1);
-
-		double nextWeightedAngle = sensorAngle * 1 / (index + 1);
-		double nextWeightedRange = sensorRange * 1 / (index + 1);
-
-		averageAngle = previousWeightedAngle + nextWeightedAngle;
-		averageRange = previousWeightedRange + nextWeightedRange;
-		totalEnergyUse += (0.5f * Math.pow(sensorRange, 2) * sensorAngle);
-
-		index++;
-	}
-
-	/**
 	 * Get the longest edge weight connecting two vertices.
 	 * 
 	 * Only edges in the logical network (MST of the input network) are taken
@@ -397,6 +373,31 @@ public class DirectionalNetwork extends Network {
 		}
 
 		return edgeLength;
+	}
+
+	/**
+	 * Update the network statistics, using info from a newly set sensor.
+	 * 
+	 * @param setSensor
+	 *            the sensor whose properties were initialized/set.
+	 */
+	private void updateStats(Sensor setSensor) {
+
+		// Keep track of average angles & range.
+		float sensorAngle = setSensor.getAntennaAngle();
+		float sensorRange = setSensor.getAntennaRange();
+
+		double previousWeightedAngle = averageAngle * index / (index + 1);
+		double previousWeightedRange = averageRange * index / (index + 1);
+
+		double nextWeightedAngle = sensorAngle * 1 / (index + 1);
+		double nextWeightedRange = sensorRange * 1 / (index + 1);
+
+		averageAngle = previousWeightedAngle + nextWeightedAngle;
+		averageRange = previousWeightedRange + nextWeightedRange;
+		totalEnergyUse += (0.5f * Math.pow(sensorRange, 2) * sensorAngle);
+
+		index++;
 	}
 
 	/**
