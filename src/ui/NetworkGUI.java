@@ -157,25 +157,69 @@ public class NetworkGUI extends JPanel implements ActionListener {
 		// In this group:
 		// controls to draw a network graph
 
-		// Create the buttons for displaying the graph.
-		JRadioButton drawDirButton = new JRadioButton("Directional");
-		JRadioButton drawOmniButton = new JRadioButton("Omnidirectional");
+		// Create the labels for the graph types (directional, omnidirectional)
+		JLabel dirLabel = new JLabel("Directional Network");
+		JLabel omniLabel = new JLabel("Omnidirectional Network");
+
+		// Create the radiobuttons for displaying the/a graph.
+		JRadioButton drawDirPhysical = new JRadioButton("Input Graph");
+		JRadioButton drawDirLogical = new JRadioButton("Logical Network");
+		JRadioButton drawDirSameRange = new JRadioButton(
+				"Logical Network Oriented, Homogeneous Range");
+		JRadioButton drawDirDiffRange = new JRadioButton(
+				"Logical Network Oriented, Heterogeneous Range");
+
+		JRadioButton drawOmniPhysical = new JRadioButton("Input Graph");
+		JRadioButton drawOmniLogical = new JRadioButton("Logical Network");
+		JRadioButton drawOmniSameRange = new JRadioButton(
+				"Logical Network Oriented, Homogeneous Range");
+		JRadioButton drawOmniDiffRange = new JRadioButton(
+				"Logical Network Oriented, Heterogeneous Range");
 
 		// Create a button group for the buttons.
 		ButtonGroup drawNetworkButtonGroup = new ButtonGroup();
-		drawNetworkButtonGroup.add(drawDirButton);
-		drawNetworkButtonGroup.add(drawOmniButton);
+		drawNetworkButtonGroup.add(drawDirPhysical);
+		drawNetworkButtonGroup.add(drawDirLogical);
+		drawNetworkButtonGroup.add(drawDirSameRange);
+		drawNetworkButtonGroup.add(drawDirDiffRange);
+		drawNetworkButtonGroup.add(drawOmniPhysical);
+		drawNetworkButtonGroup.add(drawOmniLogical);
+		drawNetworkButtonGroup.add(drawOmniSameRange);
+		drawNetworkButtonGroup.add(drawOmniDiffRange);
 
-		drawDirButton.setActionCommand("drawDir");
-		drawOmniButton.setActionCommand("drawOmni");
-		drawDirButton.addActionListener(this);
-		drawOmniButton.addActionListener(this);
+		drawDirPhysical.setActionCommand("drawDirPhysical");
+		drawDirLogical.setActionCommand("drawDirLogical");
+		drawDirSameRange.setActionCommand("drawDirSameRange");
+		drawDirDiffRange.setActionCommand("drawDirDiffRange");
+		drawOmniPhysical.setActionCommand("drawOmniPhysical");
+		drawOmniLogical.setActionCommand("drawOmniLogical");
+		drawOmniSameRange.setActionCommand("drawOmniSameRange");
+		drawOmniDiffRange.setActionCommand("drawOmniDiffRange");
 
+		drawDirPhysical.addActionListener(this);
+		drawDirLogical.addActionListener(this);
+		drawDirSameRange.addActionListener(this);
+		drawDirDiffRange.addActionListener(this);
+		drawOmniPhysical.addActionListener(this);
+		drawOmniLogical.addActionListener(this);
+		drawOmniSameRange.addActionListener(this);
+		drawOmniDiffRange.addActionListener(this);
+
+		// Add the controls to the host panel.
 		JPanel drawNetworkPanel = new JPanel();
 
 		drawNetworkPanel.setLayout(new GridLayout(0, 1));
-		drawNetworkPanel.add(drawDirButton);
-		drawNetworkPanel.add(drawOmniButton);
+		drawNetworkPanel.add(dirLabel);
+		drawNetworkPanel.add(drawDirPhysical);
+		drawNetworkPanel.add(drawDirLogical);
+		drawNetworkPanel.add(drawDirSameRange);
+		drawNetworkPanel.add(drawDirDiffRange);
+		drawNetworkPanel.add(omniLabel);
+		drawNetworkPanel.add(drawOmniPhysical);
+		drawNetworkPanel.add(drawOmniLogical);
+		drawNetworkPanel.add(drawOmniSameRange);
+		drawNetworkPanel.add(drawOmniDiffRange);
+
 		drawNetworkPanel.setBorder(BorderFactory.createCompoundBorder(
 				BorderFactory.createTitledBorder("Draw Network"),
 				BorderFactory.createEmptyBorder(5, 5, 5, 5)));
@@ -523,24 +567,57 @@ public class NetworkGUI extends JPanel implements ActionListener {
 		}
 
 		// Draw a graph on the drawing action commands.
-		if ("drawDir".equals(e.getActionCommand())) {
-			if (dirNet != null) {
-				currentGraph = dirNet.createOptimalNetwork(true);
-				drawGraph(currentGraph);
-			}
-			// Keep track of which network should be visible.
-			selectedNetwork = NetworkType.DIRECTIONAL;
+		if (dirNet != null) {
 
+			if ("drawDirPhysical".equals(e.getActionCommand())) {
+				currentGraph = dirNet.getPhysicalNetwork();
+
+			} else if ("drawDirLogical".equals(e.getActionCommand())) {
+				currentGraph = dirNet.getPhysicalNetworkMst();
+
+			} else if ("drawDirSameRange".equals(e.getActionCommand())) {
+				currentGraph = dirNet.createOptimalNetwork(true);
+
+			} else if ("drawDirDiffRange".equals(e.getActionCommand())) {
+				currentGraph = dirNet.createOptimalNetwork(false);
+			}
+
+			if ("drawDirPhysical".equals(e.getActionCommand())
+					|| "drawDirLogical".equals(e.getActionCommand())
+					|| "drawDirSameRange".equals(e.getActionCommand())
+					|| "drawDirDiffRange".equals(e.getActionCommand())) {
+
+				drawGraph(currentGraph);
+				// Keep track of which network should be visible.
+				selectedNetwork = NetworkType.DIRECTIONAL;
+			}
 		}
 
 		// Draw a graph on the drawing action commands.
-		if ("drawOmni".equals(e.getActionCommand())) {
-			if (omniNet != null) {
+		if (omniNet != null) {
+
+			if ("drawOmniPhysical".equals(e.getActionCommand())) {
+				currentGraph = omniNet.getPhysicalNetwork();
+
+			} else if ("drawOmniLogical".equals(e.getActionCommand())) {
+				currentGraph = omniNet.getPhysicalNetworkMst();
+
+			} else if ("drawOmniSameRange".equals(e.getActionCommand())) {
 				currentGraph = omniNet.createOptimalNetwork(true);
-				drawGraph(currentGraph);
+
+			} else if ("drawOmniDiffRange".equals(e.getActionCommand())) {
+				currentGraph = omniNet.createOptimalNetwork(false);
 			}
-			// Keep track of which network should be visible.
-			selectedNetwork = NetworkType.OMNIDIRECTIONAL;
+
+			if ("drawOmniPhysical".equals(e.getActionCommand())
+					|| "drawOmniLogical".equals(e.getActionCommand())
+					|| "drawOmniSameRange".equals(e.getActionCommand())
+					|| "drawOmniDiffRange".equals(e.getActionCommand())) {
+
+				drawGraph(currentGraph);
+				// Keep track of which network should be visible.
+				selectedNetwork = NetworkType.OMNIDIRECTIONAL;
+			}
 		}
 
 		// A graph should be loaded before any actual commands are available.
