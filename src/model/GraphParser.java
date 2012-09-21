@@ -17,19 +17,18 @@ import java.util.List;
  */
 public class GraphParser {
 
-	private String fileText = null;
+	// Tokens.
+	private final String NODE = "NODE";
+	private final String EDGE = "EDGE";
+
+	private final String OPEN_PARENTH = "\\(";
+	private final String CLOSE_PARENTH = "\\)";
+	private final String COMMA = "\\,";
+	private final String WHITESPACE = "\\s";
 
 	public WeightedGraph<Node, Link> parse(File file) {
-		// Tokens
-		String NODE = "NODE";
-		String EDGE = "EDGE";
 
-		String OPEN_PARENTH = "\\(";
-		String CLOSE_PARENTH = "\\)";
-		String COMMA = "\\,";
-		String WHITESPACE = "\\s";
-
-		readFile(file);
+		String fileText = readFile(file);
 
 		// Tokenize the file content.
 		String[] tokens = fileText.split("(" + WHITESPACE + "+|" + COMMA + "|"
@@ -50,6 +49,7 @@ public class GraphParser {
 		String edgeTo = "";
 
 		while (tokensIter.hasNext()) {
+
 			currentObj = tokensIter.next();
 
 			// We will have either a node or an edge.
@@ -61,6 +61,9 @@ public class GraphParser {
 			// After we know the current object get its properties.
 			if (currentObj.equals(NODE)) {
 
+				float nodeXPos;
+				float nodeYPos;
+
 				if (tokensIter.hasNext()) {
 					nodeName = tokensIter.next();
 				}
@@ -69,26 +72,27 @@ public class GraphParser {
 				}
 				if (tokensIter.hasNext()) {
 					nodeY = tokensIter.next();
-				} else {
+				}
+
+				try {
+					nodeXPos = Float.parseFloat(nodeX);
+					nodeYPos = Float.parseFloat(nodeY);
+				} catch (Exception e) {
 					continue;
 				}
 
-				Node n = new Node(nodeName, Float.parseFloat(nodeX),
-						Float.parseFloat(nodeY));
+				Node n = new Node(nodeName, nodeXPos, nodeYPos);
 
 				pn.insertVertex(n);
 				nodes.put(nodeName, n);
-			}
 
-			if (currentObj.equals(EDGE)) {
+			} else if (currentObj.equals(EDGE)) {
 
 				if (tokensIter.hasNext()) {
 					edgeFrom = tokensIter.next();
 				}
 				if (tokensIter.hasNext()) {
 					edgeTo = tokensIter.next();
-				} else {
-					continue;
 				}
 
 				Node from = nodes.get(edgeFrom);
@@ -106,7 +110,7 @@ public class GraphParser {
 		return pn;
 	}
 
-	private void readFile(File file) {
+	private String readFile(File file) {
 
 		String text = "";
 
@@ -126,7 +130,7 @@ public class GraphParser {
 			// Reading or closing the file failed.
 		}
 
-		fileText = text;
+		return text;
 	}
 
 }
