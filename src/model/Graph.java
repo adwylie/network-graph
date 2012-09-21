@@ -89,6 +89,7 @@ public class Graph<V extends Vertex, E extends EdgeInterface> implements
 	@Override
 	public boolean areAdjacent(V v, V u) {
 
+		// TODO need null check.. self loops caused .next() to error.
 		// Check that both vertices are in our graph.
 		if (v == null || u == null || !vertices.contains(v)
 				|| !vertices.contains(u)) {
@@ -99,7 +100,8 @@ public class Graph<V extends Vertex, E extends EdgeInterface> implements
 
 		while (vEdgeIter.hasNext()) {
 
-			Iterator<V> endVertIter = endVertices(vEdgeIter.next()).iterator();
+			E edge = vEdgeIter.next();
+			Iterator<V> endVertIter = endVertices(edge).iterator();
 
 			V from = endVertIter.next();
 			V to = endVertIter.next();
