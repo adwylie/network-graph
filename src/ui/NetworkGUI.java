@@ -59,7 +59,17 @@ public class NetworkGUI extends JPanel implements ActionListener {
 	private static boolean logging = !NetworkGUI.class.getProtectionDomain()
 			.getCodeSource().getLocation().toString().contains("jar");
 
-	private static final long serialVersionUID = 1L;
+	private DecimalFormat numFormatter = new DecimalFormat("###,###,##0.00");
+	private static final long serialVersionUID = 978834603780916726L;
+
+	// Draw Network Control Group (allow initial/easier selection).
+	JRadioButton drawDirGraph;
+	JRadioButton drawOmniGraph;
+
+	JRadioButton drawPhysical;
+	JRadioButton drawLogical;
+	JRadioButton drawSameRange;
+	JRadioButton drawDiffRange;
 
 	// Setup Control Group
 	private JTextField rangeUpdateTextField;
@@ -73,13 +83,10 @@ public class NetworkGUI extends JPanel implements ActionListener {
 	// Statistics Control Group
 	private JTextField averageAngleTextField;
 	private JTextField averageRangeTextField;
-
 	private JTextField averageSPLTextField;
 	private JTextField averageSPLHopsTextField;
-
 	private JTextField graphDiameterTextField;
 	private JTextField graphDiameterHopsTextField;
-
 	private JTextField totalEnergyUseTextField;
 
 	// Class members.
@@ -157,72 +164,61 @@ public class NetworkGUI extends JPanel implements ActionListener {
 		// In this group:
 		// controls to draw a network graph
 
-		// Create the labels for the graph types (directional, omnidirectional)
-		JLabel dirLabel = new JLabel("Directional Network");
-		JLabel omniLabel = new JLabel("Omnidirectional Network");
+		JLabel networkTypeLabel = new JLabel("Network Type");
+		JLabel graphTypeLabel = new JLabel("Graph Type");
 
-		// Create the radiobuttons for displaying the/a graph.
-		JRadioButton drawDirPhysical = new JRadioButton("Input Graph");
-		JRadioButton drawDirLogical = new JRadioButton("Logical Network");
-		JRadioButton drawDirSameRange = new JRadioButton(
-				"Logical Network Oriented, Homogeneous Range");
-		JRadioButton drawDirDiffRange = new JRadioButton(
-				"Logical Network Oriented, Heterogeneous Range");
+		// Create the buttons for choosing the type of graph to display.
+		drawDirGraph = new JRadioButton("Directional Network");
+		drawOmniGraph = new JRadioButton("Omnidirectional Network");
 
-		JRadioButton drawOmniPhysical = new JRadioButton("Input Graph");
-		JRadioButton drawOmniLogical = new JRadioButton("Logical Network");
-		JRadioButton drawOmniSameRange = new JRadioButton(
-				"Logical Network Oriented, Homogeneous Range");
-		JRadioButton drawOmniDiffRange = new JRadioButton(
-				"Logical Network Oriented, Heterogeneous Range");
+		// Create the buttons for displaying a graph.
+		drawPhysical = new JRadioButton("Input Graph");
+		drawLogical = new JRadioButton("Logical Network");
+		drawSameRange = new JRadioButton(
+				"Oriented Logical Network, Homogeneous Range");
+		drawDiffRange = new JRadioButton(
+				"Oriented Logical Network, Heterogeneous Range");
 
-		// Create a button group for the buttons.
+		// Create button groups for the buttons.
+		ButtonGroup selectNetworkButtonGroup = new ButtonGroup();
+		selectNetworkButtonGroup.add(drawDirGraph);
+		selectNetworkButtonGroup.add(drawOmniGraph);
+
 		ButtonGroup drawNetworkButtonGroup = new ButtonGroup();
-		drawNetworkButtonGroup.add(drawDirPhysical);
-		drawNetworkButtonGroup.add(drawDirLogical);
-		drawNetworkButtonGroup.add(drawDirSameRange);
-		drawNetworkButtonGroup.add(drawDirDiffRange);
-		drawNetworkButtonGroup.add(drawOmniPhysical);
-		drawNetworkButtonGroup.add(drawOmniLogical);
-		drawNetworkButtonGroup.add(drawOmniSameRange);
-		drawNetworkButtonGroup.add(drawOmniDiffRange);
+		drawNetworkButtonGroup.add(drawPhysical);
+		drawNetworkButtonGroup.add(drawLogical);
+		drawNetworkButtonGroup.add(drawSameRange);
+		drawNetworkButtonGroup.add(drawDiffRange);
 
-		drawDirPhysical.setActionCommand("drawDirPhysical");
-		drawDirLogical.setActionCommand("drawDirLogical");
-		drawDirSameRange.setActionCommand("drawDirSameRange");
-		drawDirDiffRange.setActionCommand("drawDirDiffRange");
-		drawOmniPhysical.setActionCommand("drawOmniPhysical");
-		drawOmniLogical.setActionCommand("drawOmniLogical");
-		drawOmniSameRange.setActionCommand("drawOmniSameRange");
-		drawOmniDiffRange.setActionCommand("drawOmniDiffRange");
+		// Add action listeners to the buttons.
+		drawDirGraph.addActionListener(this);
+		drawOmniGraph.addActionListener(this);
 
-		drawDirPhysical.addActionListener(this);
-		drawDirLogical.addActionListener(this);
-		drawDirSameRange.addActionListener(this);
-		drawDirDiffRange.addActionListener(this);
-		drawOmniPhysical.addActionListener(this);
-		drawOmniLogical.addActionListener(this);
-		drawOmniSameRange.addActionListener(this);
-		drawOmniDiffRange.addActionListener(this);
+		drawPhysical.addActionListener(this);
+		drawLogical.addActionListener(this);
+		drawSameRange.addActionListener(this);
+		drawDiffRange.addActionListener(this);
 
 		// Add the controls to the host panel.
-		JPanel drawNetworkPanel = new JPanel();
+		JPanel drawNetworkPanel = new JPanel(new GridLayout(0, 1));
 
-		drawNetworkPanel.setLayout(new GridLayout(0, 1));
-		drawNetworkPanel.add(dirLabel);
-		drawNetworkPanel.add(drawDirPhysical);
-		drawNetworkPanel.add(drawDirLogical);
-		drawNetworkPanel.add(drawDirSameRange);
-		drawNetworkPanel.add(drawDirDiffRange);
-		drawNetworkPanel.add(omniLabel);
-		drawNetworkPanel.add(drawOmniPhysical);
-		drawNetworkPanel.add(drawOmniLogical);
-		drawNetworkPanel.add(drawOmniSameRange);
-		drawNetworkPanel.add(drawOmniDiffRange);
+		drawNetworkPanel.add(networkTypeLabel);
+		drawNetworkPanel.add(drawDirGraph);
+		drawNetworkPanel.add(drawOmniGraph);
+
+		drawNetworkPanel.add(graphTypeLabel);
+		drawNetworkPanel.add(drawPhysical);
+		drawNetworkPanel.add(drawLogical);
+		drawNetworkPanel.add(drawSameRange);
+		drawNetworkPanel.add(drawDiffRange);
 
 		drawNetworkPanel.setBorder(BorderFactory.createCompoundBorder(
 				BorderFactory.createTitledBorder("Draw Network"),
 				BorderFactory.createEmptyBorder(5, 5, 5, 5)));
+
+		// Set default selection for the button groups.
+		drawDirGraph.setSelected(true);
+		drawPhysical.setSelected(true);
 
 		// /////////////////////////////////////////////////////////////////////
 		// /////////////// Setup Control Group /////////////////////////////////
@@ -520,6 +516,7 @@ public class NetworkGUI extends JPanel implements ActionListener {
 		add(optionList);
 		add(Box.createRigidArea(new Dimension(5, 0)));
 		add(canvas);
+		add(Box.createRigidArea(new Dimension(5, 0)));
 
 		optionList.add(drawNetworkPanel);
 		optionList.add(setupPanel);
@@ -527,8 +524,6 @@ public class NetworkGUI extends JPanel implements ActionListener {
 		optionList.add(statisticsPanel);
 		optionList.add(optionsPanel);
 	}
-
-	DecimalFormat numFormatter = new DecimalFormat("###,###,##0.00");
 
 	public void actionPerformed(ActionEvent e) {
 
@@ -549,74 +544,18 @@ public class NetworkGUI extends JPanel implements ActionListener {
 				if (pn != null) {
 					dirNet = new DirectionalNetwork(pn);
 					omniNet = new OmnidirectionalNetwork(pn);
+
 					JOptionPane.showMessageDialog(this.getRootPane(),
 							"Network loaded!");
+
+					// Apply default selection for the button groups.
+					// TODO: check if they only change one initial selection
+					if (drawDirGraph.isSelected() && drawPhysical.isSelected()) {
+
+						drawDirGraph.doClick();
+						drawPhysical.doClick();
+					}
 				}
-			}
-
-			// Draw the network on load if there is one selected.
-			if (selectedNetwork != null) {
-				if (NetworkType.DIRECTIONAL.equals(selectedNetwork)) {
-					currentGraph = dirNet.createOptimalNetwork(true);
-					drawGraph(currentGraph);
-				} else if (NetworkType.OMNIDIRECTIONAL.equals(selectedNetwork)) {
-					currentGraph = omniNet.createOptimalNetwork(true);
-					drawGraph(currentGraph);
-				}
-			}
-		}
-
-		// Draw a graph on the drawing action commands.
-		if (dirNet != null) {
-
-			if ("drawDirPhysical".equals(e.getActionCommand())) {
-				currentGraph = dirNet.getPhysicalNetwork();
-
-			} else if ("drawDirLogical".equals(e.getActionCommand())) {
-				currentGraph = dirNet.getPhysicalNetworkMst();
-
-			} else if ("drawDirSameRange".equals(e.getActionCommand())) {
-				currentGraph = dirNet.createOptimalNetwork(true);
-
-			} else if ("drawDirDiffRange".equals(e.getActionCommand())) {
-				currentGraph = dirNet.createOptimalNetwork(false);
-			}
-
-			if ("drawDirPhysical".equals(e.getActionCommand())
-					|| "drawDirLogical".equals(e.getActionCommand())
-					|| "drawDirSameRange".equals(e.getActionCommand())
-					|| "drawDirDiffRange".equals(e.getActionCommand())) {
-
-				drawGraph(currentGraph);
-				// Keep track of which network should be visible.
-				selectedNetwork = NetworkType.DIRECTIONAL;
-			}
-		}
-
-		// Draw a graph on the drawing action commands.
-		if (omniNet != null) {
-
-			if ("drawOmniPhysical".equals(e.getActionCommand())) {
-				currentGraph = omniNet.getPhysicalNetwork();
-
-			} else if ("drawOmniLogical".equals(e.getActionCommand())) {
-				currentGraph = omniNet.getPhysicalNetworkMst();
-
-			} else if ("drawOmniSameRange".equals(e.getActionCommand())) {
-				currentGraph = omniNet.createOptimalNetwork(true);
-
-			} else if ("drawOmniDiffRange".equals(e.getActionCommand())) {
-				currentGraph = omniNet.createOptimalNetwork(false);
-			}
-
-			if ("drawOmniPhysical".equals(e.getActionCommand())
-					|| "drawOmniLogical".equals(e.getActionCommand())
-					|| "drawOmniSameRange".equals(e.getActionCommand())
-					|| "drawOmniDiffRange".equals(e.getActionCommand())) {
-
-				drawGraph(currentGraph);
-				// Keep track of which network should be visible.
-				selectedNetwork = NetworkType.OMNIDIRECTIONAL;
 			}
 		}
 
@@ -626,6 +565,59 @@ public class NetworkGUI extends JPanel implements ActionListener {
 					"You must load a network graph before analyzing it.");
 			return;
 		}
+
+		if (drawDirGraph.isSelected()) {
+			selectedNetwork = NetworkType.DIRECTIONAL;
+
+		} else if (drawOmniGraph.isSelected()) {
+			selectedNetwork = NetworkType.OMNIDIRECTIONAL;
+		}
+
+		// TODO: extract complexity via subclass; wirelessnetwork has
+		// createOptimalNetwork(boolean)
+		if (drawPhysical.isSelected()) {
+
+			if (selectedNetwork.equals(NetworkType.DIRECTIONAL)) {
+				currentGraph = dirNet.getPhysicalNetwork();
+			} else if (selectedNetwork.equals(NetworkType.OMNIDIRECTIONAL)) {
+				currentGraph = omniNet.getPhysicalNetwork();
+			}
+
+		} else if (drawLogical.isSelected()) {
+
+			if (selectedNetwork.equals(NetworkType.DIRECTIONAL)) {
+				currentGraph = dirNet.getPhysicalNetworkMst();
+			} else if (selectedNetwork.equals(NetworkType.OMNIDIRECTIONAL)) {
+				currentGraph = omniNet.getPhysicalNetworkMst();
+			}
+
+		} else if (drawSameRange.isSelected()) {
+
+			if (selectedNetwork.equals(NetworkType.DIRECTIONAL)) {
+				currentGraph = dirNet.createOptimalNetwork(true);
+			} else if (selectedNetwork.equals(NetworkType.OMNIDIRECTIONAL)) {
+				currentGraph = omniNet.createOptimalNetwork(true);
+			}
+
+		} else if (drawDiffRange.isSelected()) {
+
+			if (selectedNetwork.equals(NetworkType.DIRECTIONAL)) {
+				currentGraph = dirNet.createOptimalNetwork(false);
+			} else if (selectedNetwork.equals(NetworkType.OMNIDIRECTIONAL)) {
+				currentGraph = omniNet.createOptimalNetwork(false);
+			}
+		}
+
+		// Make sure that we have a selection on both button groups, if so then
+		// draw the network graph.
+		if (selectedNetwork != null && currentGraph != null) {
+			drawGraph(currentGraph);
+		} else {
+			return;
+		}
+
+		// TODO: disable sensor range setting on optimal diff range
+		// TODO: parser rework
 
 		// Action event code for the shortest path retrieval.
 		if ("getPath".equals(e.getActionCommand())) {
