@@ -11,7 +11,7 @@ import java.util.Set;
  * @version 1.0
  * @since 2012-09-12
  */
-public class OmnidirectionalNetwork extends Network {
+public class OmnidirectionalNetwork extends WirelessNetwork {
 
 	int index = 0;
 
@@ -26,15 +26,7 @@ public class OmnidirectionalNetwork extends Network {
 		super(physicalNetwork);
 	}
 
-	/**
-	 * Create a network from the logical network which is optimal.
-	 * 
-	 * @param sameRange
-	 *            a boolean value indicating whether all sensors will have the
-	 *            same range.
-	 * 
-	 * @return the constructed network.
-	 */
+	@Override
 	public WeightedGraph<Sensor, Link> createOptimalNetwork(boolean sameRange) {
 
 		if (sameRange) {
@@ -122,17 +114,7 @@ public class OmnidirectionalNetwork extends Network {
 		return network;
 	}
 
-	/**
-	 * Create a network from the logical network.
-	 * 
-	 * The network created will be configured such that all sensors have the
-	 * same range.
-	 * 
-	 * @param sensorRange
-	 *            the range for each sensor.
-	 * 
-	 * @return the constructed network.
-	 */
+	@Override
 	public WeightedGraph<Sensor, Link> createNetwork(float sensorRange) {
 
 		resetStatistics();

@@ -41,11 +41,11 @@ import model.Graph;
 import model.GraphParser;
 import model.Link;
 import model.Network;
-import model.NetworkType;
 import model.Node;
 import model.OmnidirectionalNetwork;
 import model.Vertex;
 import model.WeightedGraph;
+import model.WirelessNetwork;
 
 /**
  * @author Andrew Wylie <andrew.dale.wylie@gmail.com>
@@ -97,7 +97,7 @@ public class NetworkGUI extends JPanel implements ActionListener {
 	private JCanvas canvas;
 	private DirectionalNetwork dirNet = null;
 	private OmnidirectionalNetwork omniNet = null;
-	private NetworkType selectedNetwork = null;
+	private WirelessNetwork currentNetwork = null;
 
 	// Keep the vertex type generic so we can draw both the physical network
 	// (Node) and a logical network (Sensor).
@@ -574,50 +574,28 @@ public class NetworkGUI extends JPanel implements ActionListener {
 		}
 
 		if (drawDirGraph.isSelected()) {
-			selectedNetwork = NetworkType.DIRECTIONAL;
+			currentNetwork = dirNet;
 
 		} else if (drawOmniGraph.isSelected()) {
-			selectedNetwork = NetworkType.OMNIDIRECTIONAL;
+			currentNetwork = omniNet;
 		}
 
-		// TODO: extract complexity via subclass; wirelessnetwork has
-		// createOptimalNetwork(boolean)
 		if (drawPhysical.isSelected()) {
-
-			if (selectedNetwork.equals(NetworkType.DIRECTIONAL)) {
-				currentGraph = dirNet.getPhysicalNetwork();
-			} else if (selectedNetwork.equals(NetworkType.OMNIDIRECTIONAL)) {
-				currentGraph = omniNet.getPhysicalNetwork();
-			}
+			currentGraph = currentNetwork.getPhysicalNetwork();
 
 		} else if (drawLogical.isSelected()) {
-
-			if (selectedNetwork.equals(NetworkType.DIRECTIONAL)) {
-				currentGraph = dirNet.getLogicalNetwork();
-			} else if (selectedNetwork.equals(NetworkType.OMNIDIRECTIONAL)) {
-				currentGraph = omniNet.getLogicalNetwork();
-			}
+			currentGraph = currentNetwork.getLogicalNetwork();
 
 		} else if (drawSameRange.isSelected()) {
-
-			if (selectedNetwork.equals(NetworkType.DIRECTIONAL)) {
-				currentGraph = dirNet.createOptimalNetwork(true);
-			} else if (selectedNetwork.equals(NetworkType.OMNIDIRECTIONAL)) {
-				currentGraph = omniNet.createOptimalNetwork(true);
-			}
+			currentGraph = currentNetwork.createOptimalNetwork(true);
 
 		} else if (drawDiffRange.isSelected()) {
-
-			if (selectedNetwork.equals(NetworkType.DIRECTIONAL)) {
-				currentGraph = dirNet.createOptimalNetwork(false);
-			} else if (selectedNetwork.equals(NetworkType.OMNIDIRECTIONAL)) {
-				currentGraph = omniNet.createOptimalNetwork(false);
-			}
+			currentGraph = currentNetwork.createOptimalNetwork(false);
 		}
 
 		// Make sure that we have a selection on both button groups, if so then
 		// draw the network graph.
-		if (selectedNetwork != null && currentGraph != null) {
+		if (currentNetwork != null && currentGraph != null) {
 			drawGraph(currentGraph);
 		} else {
 			return;
@@ -676,13 +654,7 @@ public class NetworkGUI extends JPanel implements ActionListener {
 			pathLengthTextField.setText("");
 			pathLengthHopsTextField.setText("");
 
-			if (NetworkType.DIRECTIONAL.equals(selectedNetwork)) {
-				currentGraph = dirNet.createOptimalNetwork(true);
-
-			} else if (NetworkType.OMNIDIRECTIONAL.equals(selectedNetwork)) {
-				currentGraph = omniNet.createOptimalNetwork(true);
-			}
-
+			currentGraph = currentNetwork.createOptimalNetwork(true);
 			drawGraph(currentGraph);
 		}
 
@@ -712,39 +684,22 @@ public class NetworkGUI extends JPanel implements ActionListener {
 				return;
 			}
 
-			if (NetworkType.DIRECTIONAL.equals(selectedNetwork)) {
-				currentGraph = dirNet.createNetwork(newRange);
-
-			} else if (NetworkType.OMNIDIRECTIONAL.equals(selectedNetwork)) {
-				currentGraph = omniNet.createNetwork(newRange);
-			}
-
+			currentGraph = currentNetwork.createNetwork(newRange);
 			drawGraph(currentGraph);
 
 		} else if ("resetSetup".equals(e.getActionCommand())) {
 
 			rangeUpdateTextField.setText("");
 
-			if (NetworkType.DIRECTIONAL.equals(selectedNetwork)) {
-				currentGraph = dirNet.createOptimalNetwork(true);
-
-			} else if (NetworkType.OMNIDIRECTIONAL.equals(selectedNetwork)) {
-				currentGraph = omniNet.createOptimalNetwork(true);
-			}
-
+			currentGraph = currentNetwork.createOptimalNetwork(true);
 			drawGraph(currentGraph);
 		}
 
 		// On any event we want to update the network statistics.
-		if (NetworkType.DIRECTIONAL.equals(selectedNetwork)) {
-			updateUiStatistics(dirNet, currentGraph);
-
-		} else if (NetworkType.OMNIDIRECTIONAL.equals(selectedNetwork)) {
-			updateUiStatistics(omniNet, currentGraph);
-		}
+		updateUiStatistics(currentNetwork, currentGraph);
 	}
 
-	// populate the ui fields with information about the current network
+	// Populate the ui fields with information about the current network
 	private void updateUiStatistics(Network net,
 			WeightedGraph<? extends Vertex, Link> wg) {
 
