@@ -104,6 +104,7 @@ public class GraphParser {
 				}
 
 				pn.insertEdge(from, to, new Link(from.getName() + to.getName()));
+				pn.insertEdge(to, from, new Link(to.getName() + from.getName()));
 			}
 		}
 
