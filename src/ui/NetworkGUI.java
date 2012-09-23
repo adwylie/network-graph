@@ -547,14 +547,6 @@ public class NetworkGUI extends JPanel implements ActionListener {
 
 					JOptionPane.showMessageDialog(this.getRootPane(),
 							"Network loaded!");
-
-					// Apply default selection for the button groups.
-					// TODO: check if they only change one initial selection
-					if (drawDirGraph.isSelected() && drawPhysical.isSelected()) {
-
-						drawDirGraph.doClick();
-						drawPhysical.doClick();
-					}
 				}
 			}
 		}
@@ -622,14 +614,6 @@ public class NetworkGUI extends JPanel implements ActionListener {
 		// Action event code for the shortest path retrieval.
 		if ("getPath".equals(e.getActionCommand())) {
 
-			// There must be a network currently selected.
-			if (selectedNetwork == null) {
-				JOptionPane.showMessageDialog(this.getRootPane(),
-						"A network must be selected for"
-								+ " which to find a path in.");
-				return;
-			}
-
 			// Code for the shortest specified path button.
 			if (pathFromTextField.getText().equals("")
 					|| pathToTextField.getText().equals("")) {
@@ -651,19 +635,17 @@ public class NetworkGUI extends JPanel implements ActionListener {
 			List<? extends Vertex> sp = null;
 
 			// Get the route length.
-			if (selectedNetwork != null) {
-				if (NetworkType.DIRECTIONAL.equals(selectedNetwork)) {
+			if (NetworkType.DIRECTIONAL.equals(selectedNetwork)) {
 
-					splh = currentGraph.getShortestPathLengthHops(from, to);
-					spl = currentGraph.getShortestPathLength(from, to);
-					sp = currentGraph.getShortestPath(from, to);
+				splh = currentGraph.getShortestPathLengthHops(from, to);
+				spl = currentGraph.getShortestPathLength(from, to);
+				sp = currentGraph.getShortestPath(from, to);
 
-				} else if (NetworkType.OMNIDIRECTIONAL.equals(selectedNetwork)) {
+			} else if (NetworkType.OMNIDIRECTIONAL.equals(selectedNetwork)) {
 
-					splh = currentGraph.getShortestPathLengthHops(from, to);
-					spl = currentGraph.getShortestPathLength(from, to);
-					sp = currentGraph.getShortestPath(from, to);
-				}
+				splh = currentGraph.getShortestPathLengthHops(from, to);
+				spl = currentGraph.getShortestPathLength(from, to);
+				sp = currentGraph.getShortestPath(from, to);
 			}
 
 			pathLengthHopsTextField.setText(numFormatter.format(splh));
@@ -684,6 +666,21 @@ public class NetworkGUI extends JPanel implements ActionListener {
 
 				canvas.add(polyline);
 			}
+
+		} else if ("resetPath".equals(e.getActionCommand())) {
+
+			pathFromTextField.setText("");
+			pathToTextField.setText("");
+			pathLengthTextField.setText("");
+			pathLengthHopsTextField.setText("");
+
+			if (NetworkType.DIRECTIONAL.equals(selectedNetwork)) {
+				currentGraph = dirNet.createOptimalNetwork(true);
+				drawGraph(currentGraph);
+			} else if (NetworkType.OMNIDIRECTIONAL.equals(selectedNetwork)) {
+				currentGraph = omniNet.createOptimalNetwork(true);
+				drawGraph(currentGraph);
+			}
 		}
 
 		// Action event code for the sensor range updating.
@@ -692,92 +689,45 @@ public class NetworkGUI extends JPanel implements ActionListener {
 			// Update Range.
 			String newRangeText = rangeUpdateTextField.getText();
 
-			// There must be a network currently selected.
-			if (selectedNetwork == null) {
-
+			// Check the value validity.
+			if (newRangeText.equals("")) {
+				// Create dialog to inform user to enter info.
 				JOptionPane.showMessageDialog(this.getRootPane(),
-						"A network must be selected for"
-								+ " which to update sensor range.");
+						"Enter sensor range to be set.");
 				return;
 			}
 
-			if (selectedNetwork != null) {
+			// TODO exception handling
+			float newRange = Float.parseFloat(newRangeText);
 
-				// Check the value validity.
-				if (newRangeText.equals("")) {
-					// Create dialog to inform user to enter info.
-					JOptionPane.showMessageDialog(this.getRootPane(),
-							"Enter sensor range to be set.");
-					return;
-				}
-
-				// TODO exception handling
-				float newRange = Float.parseFloat(newRangeText);
-
-				if (NetworkType.DIRECTIONAL.equals(selectedNetwork)) {
-					currentGraph = dirNet.createNetwork(newRange);
-					drawGraph(currentGraph);
-				} else if (NetworkType.OMNIDIRECTIONAL.equals(selectedNetwork)) {
-					currentGraph = omniNet.createNetwork(newRange);
-					drawGraph(currentGraph);
-				}
+			if (NetworkType.DIRECTIONAL.equals(selectedNetwork)) {
+				currentGraph = dirNet.createNetwork(newRange);
+				drawGraph(currentGraph);
+			} else if (NetworkType.OMNIDIRECTIONAL.equals(selectedNetwork)) {
+				currentGraph = omniNet.createNetwork(newRange);
+				drawGraph(currentGraph);
 			}
 
 		} else if ("resetSetup".equals(e.getActionCommand())) {
 
-			// There must be a network currently selected.
-			if (selectedNetwork == null) {
-				JOptionPane.showMessageDialog(this.getRootPane(),
-						"A network must be selected for"
-								+ " which to reset sensor range.");
-				return;
-			}
-
 			rangeUpdateTextField.setText("");
 
-			if (selectedNetwork != null) {
-				if (NetworkType.DIRECTIONAL.equals(selectedNetwork)) {
-					currentGraph = dirNet.createOptimalNetwork(true);
-					drawGraph(currentGraph);
-				} else if (NetworkType.OMNIDIRECTIONAL.equals(selectedNetwork)) {
-					currentGraph = omniNet.createOptimalNetwork(true);
-					drawGraph(currentGraph);
-				}
-			}
-		} else if ("resetPath".equals(e.getActionCommand())) {
-
-			// There must be a network currently selected.
-			if (selectedNetwork == null) {
-				JOptionPane.showMessageDialog(this.getRootPane(),
-						"A network must be selected for a path to be found.");
-				return;
-			}
-
-			pathFromTextField.setText("");
-			pathToTextField.setText("");
-			pathLengthTextField.setText("");
-			pathLengthHopsTextField.setText("");
-
-			if (selectedNetwork != null) {
-				if (NetworkType.DIRECTIONAL.equals(selectedNetwork)) {
-					currentGraph = dirNet.createOptimalNetwork(true);
-					drawGraph(currentGraph);
-				} else if (NetworkType.OMNIDIRECTIONAL.equals(selectedNetwork)) {
-					currentGraph = omniNet.createOptimalNetwork(true);
-					drawGraph(currentGraph);
-				}
+			if (NetworkType.DIRECTIONAL.equals(selectedNetwork)) {
+				currentGraph = dirNet.createOptimalNetwork(true);
+				drawGraph(currentGraph);
+			} else if (NetworkType.OMNIDIRECTIONAL.equals(selectedNetwork)) {
+				currentGraph = omniNet.createOptimalNetwork(true);
+				drawGraph(currentGraph);
 			}
 		}
 
 		// On any event we want to update the network statistics.
-		if (selectedNetwork != null) {
-			if (NetworkType.DIRECTIONAL.equals(selectedNetwork)) {
-				updateUiStatistics(dirNet, currentGraph);
-			} else if (NetworkType.OMNIDIRECTIONAL.equals(selectedNetwork)) {
-				updateUiStatistics(omniNet, currentGraph);
-			}
-		}
+		if (NetworkType.DIRECTIONAL.equals(selectedNetwork)) {
+			updateUiStatistics(dirNet, currentGraph);
 
+		} else if (NetworkType.OMNIDIRECTIONAL.equals(selectedNetwork)) {
+			updateUiStatistics(omniNet, currentGraph);
+		}
 	}
 
 	// populate the ui fields with information about the current network
