@@ -14,6 +14,7 @@ The simulation presents an algorithm which contructs a strongly connected networ
 ###Graph Creation
 
 Input graphs are created by the import of a text file containing the graph information. The format is as follows:
+
     // create a vertex/node at position (x, y)
     NODE(*name*, *x*, *y*)
     // create an edge connecting the named vertices
@@ -21,7 +22,7 @@ Input graphs are created by the import of a text file containing the graph infor
 
 A vertex/node is given an x position and y position in the plane, along with a name. An edge is created by identifying two vertices which the edge connects to. In this case, the input graph is undirected, so order does not matter. The file is parsed without lookback, so any vertices named by an edge must be created before the edge.
 
-## User Interface
+### User Interface
 
 The user interface allows for either an omnidirectional or directional network to be drawn, with respect to certain specified parameters. All of the input graph, the intermediate minimum spanning tree, and oriented graphs wherein all sensors have either an identical range, or individual ranges can be selected to be examined. Additional controls exist to view the shortest path from any vertex to another, along with controls to manually set the sensor ranges when viewing an oriented graph with identical sensor range. For each graph, statistics are also shown.
 
