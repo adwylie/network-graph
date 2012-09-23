@@ -73,6 +73,8 @@ public class NetworkGUI extends JPanel implements ActionListener {
 
 	// Setup Control Group
 	private JTextField rangeUpdateTextField;
+	private JButton applySetupButton;
+	private JButton resetSetupButton;
 
 	// Performance Control Group
 	private JTextField pathFromTextField;
@@ -216,10 +218,6 @@ public class NetworkGUI extends JPanel implements ActionListener {
 				BorderFactory.createTitledBorder("Draw Network"),
 				BorderFactory.createEmptyBorder(5, 5, 5, 5)));
 
-		// Set default selection for the button groups.
-		drawDirGraph.setSelected(true);
-		drawPhysical.setSelected(true);
-
 		// /////////////////////////////////////////////////////////////////////
 		// /////////////// Setup Control Group /////////////////////////////////
 		// /////////////////////////////////////////////////////////////////////
@@ -228,15 +226,16 @@ public class NetworkGUI extends JPanel implements ActionListener {
 		// controls to update range
 
 		JLabel rangeUpdateLabel = new JLabel("Set Sensor Range:");
-		rangeUpdateTextField = new JTextField(4);
-		JButton applySetupButton = new JButton("Apply Changes");
-		JButton resetSetupButton = new JButton("Reset");
 
+		rangeUpdateTextField = new JTextField(4);
 		rangeUpdateTextField.setHorizontalAlignment(JTextField.RIGHT);
 
+		applySetupButton = new JButton("Apply Changes");
 		applySetupButton.setActionCommand("applySetup");
-		resetSetupButton.setActionCommand("resetSetup");
 		applySetupButton.addActionListener(this);
+
+		resetSetupButton = new JButton("Reset");
+		resetSetupButton.setActionCommand("resetSetup");
 		resetSetupButton.addActionListener(this);
 
 		// Create the layout constraints object.
@@ -250,8 +249,7 @@ public class NetworkGUI extends JPanel implements ActionListener {
 		c.gridy = 0;
 		c.insets = new Insets(5, 5, 0, 5);
 
-		JPanel setupPanel = new JPanel();
-		setupPanel.setLayout(new GridBagLayout());
+		JPanel setupPanel = new JPanel(new GridBagLayout());
 
 		setupPanel.add(rangeUpdateLabel, c);
 		c.gridx += 1;
@@ -323,8 +321,7 @@ public class NetworkGUI extends JPanel implements ActionListener {
 		c.gridy = 0;
 		c.insets = new Insets(5, 5, 0, 5);
 
-		JPanel performancePanel = new JPanel();
-		performancePanel.setLayout(new GridBagLayout());
+		JPanel performancePanel = new JPanel(new GridBagLayout());
 
 		c.gridwidth = 2;
 		performancePanel.add(pathLabel);
@@ -440,8 +437,7 @@ public class NetworkGUI extends JPanel implements ActionListener {
 		c.gridy = 0;
 		c.insets = new Insets(5, 5, 0, 5);
 
-		JPanel statisticsPanel = new JPanel();
-		statisticsPanel.setLayout(new GridBagLayout());
+		JPanel statisticsPanel = new JPanel(new GridBagLayout());
 
 		statisticsPanel.add(averageAngleLabel, c);
 		c.gridx += 1;
@@ -523,6 +519,17 @@ public class NetworkGUI extends JPanel implements ActionListener {
 		optionList.add(performancePanel);
 		optionList.add(statisticsPanel);
 		optionList.add(optionsPanel);
+
+		// /////////////////////////////////////////////////////////////////////
+		// ///////////////////// Initial Setup /////////////////////////////////
+		// /////////////////////////////////////////////////////////////////////
+
+		// Set default selection for the button groups.
+		drawDirGraph.setSelected(true);
+		drawPhysical.setSelected(true);
+
+		// Set the default control configuration.
+		setSetupControlsEnabled(drawSameRange.isSelected());
 	}
 
 	public void actionPerformed(ActionEvent e) {
@@ -608,7 +615,9 @@ public class NetworkGUI extends JPanel implements ActionListener {
 			return;
 		}
 
-		// TODO: disable sensor range setting on optimal diff range
+		// Disable or enable the setup control group based on selected graph.
+		setSetupControlsEnabled(drawSameRange.isSelected());
+
 		// TODO: parser rework
 
 		// Action event code for the shortest path retrieval.
@@ -750,6 +759,13 @@ public class NetworkGUI extends JPanel implements ActionListener {
 		String fDiamHops = numFormatter.format(wg.getDiameterHops());
 		graphDiameterTextField.setText(fDiam);
 		graphDiameterHopsTextField.setText(fDiamHops);
+	}
+
+	private void setSetupControlsEnabled(boolean enabled) {
+
+		rangeUpdateTextField.setEnabled(enabled);
+		applySetupButton.setEnabled(enabled);
+		resetSetupButton.setEnabled(enabled);
 	}
 
 	// Redraw the input graph.
