@@ -593,9 +593,9 @@ public class NetworkGUI extends JPanel implements ActionListener {
 		} else if (drawLogical.isSelected()) {
 
 			if (selectedNetwork.equals(NetworkType.DIRECTIONAL)) {
-				currentGraph = dirNet.getPhysicalNetworkMst();
+				currentGraph = dirNet.getLogicalNetwork();
 			} else if (selectedNetwork.equals(NetworkType.OMNIDIRECTIONAL)) {
-				currentGraph = omniNet.getPhysicalNetworkMst();
+				currentGraph = omniNet.getLogicalNetwork();
 			}
 
 		} else if (drawSameRange.isSelected()) {

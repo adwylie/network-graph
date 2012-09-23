@@ -13,7 +13,7 @@ import algorithms.PrimMST;
 public abstract class Network {
 
 	protected WeightedGraph<Node, Link> physicalNetwork = null;
-	protected PrimMST<Node, Link> physicalNetworkMst = null;
+	private PrimMST<Node, Link> physicalNetworkMst = null;
 
 	/**
 	 * The logical network will always have the same graph structure, though
@@ -95,26 +95,26 @@ public abstract class Network {
 	}
 
 	/**
-	 * Get the physical network MST.
-	 * 
-	 * @return a weighted graph of nodes and links, representing the physical
-	 *         network MST configuration.
-	 */
-	// TODO remove after completing changes to getLogicalNetwork()
-	@Deprecated
-	public WeightedGraph<Node, Link> getPhysicalNetworkMst() {
-		return physicalNetworkMst.getMst();
-	}
-
-	/**
 	 * Get the logical network.
 	 * 
 	 * @return a weighted graph of sensors and links, representing the logical
 	 *         network configuration.
 	 */
-	// TODO Sensors may have range & directions set by subclasses, reset them
-	// when returning the network.
 	public WeightedGraph<Sensor, Link> getLogicalNetwork() {
+
+		// Reset the sensor properties as they may be set by subclass methods.
+		Iterator<Sensor> vertsIter = logicalNetwork.vertices().iterator();
+
+		while (vertsIter.hasNext()) {
+
+			Sensor v = vertsIter.next();
+
+			v.setAntennaRange(0f);
+			v.setAntennaDirection(0f);
+			v.setAntennaAngle(0f);
+			v.setAntennaType(AntennaType.OMNIDIRECTIONAL);
+		}
+
 		return logicalNetwork;
 	}
 
