@@ -624,29 +624,14 @@ public class NetworkGUI extends JPanel implements ActionListener {
 				return;
 			}
 
-			// Reset any path currently drawn.
-			drawGraph(currentGraph);
-
 			// Set up some temporary variables to prevent code repetition.
 			String from = pathFromTextField.getText();
 			String to = pathToTextField.getText();
-			int splh = 0;
-			float spl = 0f;
-			List<? extends Vertex> sp = null;
 
 			// Get the route length.
-			if (NetworkType.DIRECTIONAL.equals(selectedNetwork)) {
-
-				splh = currentGraph.getShortestPathLengthHops(from, to);
-				spl = currentGraph.getShortestPathLength(from, to);
-				sp = currentGraph.getShortestPath(from, to);
-
-			} else if (NetworkType.OMNIDIRECTIONAL.equals(selectedNetwork)) {
-
-				splh = currentGraph.getShortestPathLengthHops(from, to);
-				spl = currentGraph.getShortestPathLength(from, to);
-				sp = currentGraph.getShortestPath(from, to);
-			}
+			int splh = currentGraph.getShortestPathLengthHops(from, to);
+			float spl = currentGraph.getShortestPathLength(from, to);
+			List<? extends Vertex> sp = currentGraph.getShortestPath(from, to);
 
 			pathLengthHopsTextField.setText(numFormatter.format(splh));
 			pathLengthTextField.setText(numFormatter.format(spl));
@@ -676,11 +661,12 @@ public class NetworkGUI extends JPanel implements ActionListener {
 
 			if (NetworkType.DIRECTIONAL.equals(selectedNetwork)) {
 				currentGraph = dirNet.createOptimalNetwork(true);
-				drawGraph(currentGraph);
+
 			} else if (NetworkType.OMNIDIRECTIONAL.equals(selectedNetwork)) {
 				currentGraph = omniNet.createOptimalNetwork(true);
-				drawGraph(currentGraph);
 			}
+
+			drawGraph(currentGraph);
 		}
 
 		// Action event code for the sensor range updating.
@@ -697,16 +683,26 @@ public class NetworkGUI extends JPanel implements ActionListener {
 				return;
 			}
 
-			// TODO exception handling
-			float newRange = Float.parseFloat(newRangeText);
+			float newRange = 0f;
+
+			try {
+				newRange = Float.parseFloat(newRangeText);
+
+			} catch (NumberFormatException nfe) {
+
+				JOptionPane.showMessageDialog(this.getRootPane(),
+						"Sensor range must be a number.");
+				return;
+			}
 
 			if (NetworkType.DIRECTIONAL.equals(selectedNetwork)) {
 				currentGraph = dirNet.createNetwork(newRange);
-				drawGraph(currentGraph);
+
 			} else if (NetworkType.OMNIDIRECTIONAL.equals(selectedNetwork)) {
 				currentGraph = omniNet.createNetwork(newRange);
-				drawGraph(currentGraph);
 			}
+
+			drawGraph(currentGraph);
 
 		} else if ("resetSetup".equals(e.getActionCommand())) {
 
@@ -714,11 +710,12 @@ public class NetworkGUI extends JPanel implements ActionListener {
 
 			if (NetworkType.DIRECTIONAL.equals(selectedNetwork)) {
 				currentGraph = dirNet.createOptimalNetwork(true);
-				drawGraph(currentGraph);
+
 			} else if (NetworkType.OMNIDIRECTIONAL.equals(selectedNetwork)) {
 				currentGraph = omniNet.createOptimalNetwork(true);
-				drawGraph(currentGraph);
 			}
+
+			drawGraph(currentGraph);
 		}
 
 		// On any event we want to update the network statistics.
