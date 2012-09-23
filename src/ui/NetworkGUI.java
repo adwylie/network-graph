@@ -531,7 +531,8 @@ public class NetworkGUI extends JPanel implements ActionListener {
 		drawPhysical.setSelected(true);
 
 		// Set the default control configuration.
-		setSetupControlsEnabled(drawSameRange.isSelected());
+		setDrawNetworkControlsEnabled(false);
+		setSetupControlsEnabled(false);
 		setPerformanceControlsEnabled(false);
 	}
 
@@ -555,10 +556,12 @@ public class NetworkGUI extends JPanel implements ActionListener {
 					dirNet = new DirectionalNetwork(pn);
 					omniNet = new OmnidirectionalNetwork(pn);
 
-					setPerformanceControlsEnabled(true);
-
 					JOptionPane.showMessageDialog(this.getRootPane(),
 							"Network loaded!");
+
+					setDrawNetworkControlsEnabled(true);
+					setSetupControlsEnabled(drawSameRange.isSelected());
+					setPerformanceControlsEnabled(true);
 				}
 			}
 		}
@@ -764,6 +767,17 @@ public class NetworkGUI extends JPanel implements ActionListener {
 		String fDiamHops = numFormatter.format(wg.getDiameterHops());
 		graphDiameterTextField.setText(fDiam);
 		graphDiameterHopsTextField.setText(fDiamHops);
+	}
+
+	private void setDrawNetworkControlsEnabled(boolean enabled) {
+
+		drawDirGraph.setEnabled(enabled);
+		drawOmniGraph.setEnabled(enabled);
+
+		drawPhysical.setEnabled(enabled);
+		drawLogical.setEnabled(enabled);
+		drawSameRange.setEnabled(enabled);
+		drawDiffRange.setEnabled(enabled);
 	}
 
 	private void setSetupControlsEnabled(boolean enabled) {
