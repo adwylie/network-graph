@@ -81,6 +81,8 @@ public class NetworkGUI extends JPanel implements ActionListener {
 	private JTextField pathToTextField;
 	private JTextField pathLengthTextField;
 	private JTextField pathLengthHopsTextField;
+	private JButton getPathButton;
+	private JButton resetPathButton;
 
 	// Statistics Control Group
 	private JTextField averageAngleTextField;
@@ -124,7 +126,7 @@ public class NetworkGUI extends JPanel implements ActionListener {
 		}
 
 		// Create and set up the main window.
-		JFrame rootFrame = new JFrame("NetworkDemo: Andrew Wylie");
+		JFrame rootFrame = new JFrame("Network Simulator");
 		rootFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		rootFrame.setSize(800, 600);
 		rootFrame.setResizable(false);
@@ -276,11 +278,11 @@ public class NetworkGUI extends JPanel implements ActionListener {
 		// shortest path (draw) & its length. given a -> b
 		// Length of a route
 
-		JButton pathButton = new JButton("Get Path");
-		pathButton.setActionCommand("getPath");
-		pathButton.addActionListener(this);
+		getPathButton = new JButton("Get Path");
+		getPathButton.setActionCommand("getPath");
+		getPathButton.addActionListener(this);
 
-		JButton resetPathButton = new JButton("Reset");
+		resetPathButton = new JButton("Reset");
 		resetPathButton.setActionCommand("resetPath");
 		resetPathButton.addActionListener(this);
 
@@ -356,7 +358,7 @@ public class NetworkGUI extends JPanel implements ActionListener {
 		performancePanel.add(new JSeparator(SwingConstants.HORIZONTAL), c);
 		c.gridwidth = 1;
 		c.gridy += 1;
-		performancePanel.add(pathButton, c);
+		performancePanel.add(getPathButton, c);
 		c.gridx += 1;
 		performancePanel.add(resetPathButton, c);
 
@@ -530,6 +532,7 @@ public class NetworkGUI extends JPanel implements ActionListener {
 
 		// Set the default control configuration.
 		setSetupControlsEnabled(drawSameRange.isSelected());
+		setPerformanceControlsEnabled(false);
 	}
 
 	public void actionPerformed(ActionEvent e) {
@@ -551,6 +554,8 @@ public class NetworkGUI extends JPanel implements ActionListener {
 				if (pn != null) {
 					dirNet = new DirectionalNetwork(pn);
 					omniNet = new OmnidirectionalNetwork(pn);
+
+					setPerformanceControlsEnabled(true);
 
 					JOptionPane.showMessageDialog(this.getRootPane(),
 							"Network loaded!");
@@ -766,6 +771,16 @@ public class NetworkGUI extends JPanel implements ActionListener {
 		rangeUpdateTextField.setEnabled(enabled);
 		applySetupButton.setEnabled(enabled);
 		resetSetupButton.setEnabled(enabled);
+	}
+
+	private void setPerformanceControlsEnabled(boolean enabled) {
+
+		pathFromTextField.setEnabled(enabled);
+		pathToTextField.setEnabled(enabled);
+		pathLengthTextField.setEnabled(enabled);
+		pathLengthHopsTextField.setEnabled(enabled);
+		getPathButton.setEnabled(enabled);
+		resetPathButton.setEnabled(enabled);
 	}
 
 	// Redraw the input graph.
