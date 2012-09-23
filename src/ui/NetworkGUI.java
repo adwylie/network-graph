@@ -112,6 +112,10 @@ public class NetworkGUI extends JPanel implements ActionListener {
 		});
 	}
 
+	/**
+	 * Create the NetworkGUI panel, attach it to a JFrame, and set any other
+	 * initial settings to initialize the ui; system look & feel, size, &c.
+	 */
 	private static void initializeGUI() {
 
 		// Set the system look and feel.
@@ -603,8 +607,6 @@ public class NetworkGUI extends JPanel implements ActionListener {
 
 		// Disable or enable the setup control group based on selected graph.
 		setSetupControlsEnabled(drawSameRange.isSelected());
-
-		// TODO: parser rework
 
 		// Action event code for the shortest path retrieval.
 		if ("getPath".equals(e.getActionCommand())) {
