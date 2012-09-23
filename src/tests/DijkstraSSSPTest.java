@@ -41,21 +41,29 @@ public class DijkstraSSSPTest {
 		pn.insertVertex(a);
 		pn.insertVertex(b);
 
+		pn.insertEdge(b, a, new Link(b.getName() + a.getName()));
 		pn.insertEdge(a, b, new Link(a.getName() + b.getName()));
 
 		// Run the orientation algorithm.
 		DirectionalNetwork dirNet = new DirectionalNetwork(pn);
 		WeightedGraph<Sensor, Link> logicalNet = dirNet.getLogicalNetwork();
 
-		// The graph only has one edge.
-		Link expectedE = logicalNet.edges().iterator().next();
+		ArrayList<Link> expectedE;
 		ArrayList<Sensor> expectedV;
+		expectedE = new ArrayList<Link>(logicalNet.edges());
 		expectedV = new ArrayList<Sensor>(logicalNet.vertices());
 
 		// Since the graph vertices() returns a set, the created arraylist may
-		// be different. Correct the ordering.
+		// be different. Correct the ordering. We want A -> B.
 		if (expectedV.get(0).getName().equals("B")) {
 			expectedV.add(expectedV.remove(0));
+		}
+
+		// Do the same thing for the edges.
+		if (expectedE.get(0).getName().equals("AB")) {
+			expectedE.remove(1);
+		} else {
+			expectedE.remove(0);
 		}
 
 		DijkstraSSSP<Sensor, Link> sssp;
@@ -64,8 +72,8 @@ public class DijkstraSSSPTest {
 
 		assertEquals(expectedV, sssp.getPathVerts());
 
-		assertEquals(1, sssp.getPathEdges().size());
-		assertEquals(expectedE, sssp.getPathEdges().get(0));
+		assertEquals(expectedE.size(), sssp.getPathEdges().size());
+		assertEquals(expectedE.get(0), sssp.getPathEdges().get(0));
 
 		assertEquals(4f, sssp.getPathWeight(), 0f);
 	}
@@ -120,7 +128,5 @@ public class DijkstraSSSPTest {
 		assertEquals(path, sssp.getPathEdges());
 		assertEquals(4f, sssp.getPathWeight(), 0f);
 		path.clear();
-
 	}
-
 }
