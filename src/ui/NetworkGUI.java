@@ -654,7 +654,6 @@ public class NetworkGUI extends JPanel implements ActionListener {
 			pathLengthTextField.setText("");
 			pathLengthHopsTextField.setText("");
 
-			currentGraph = currentNetwork.createOptimalNetwork(true);
 			drawGraph(currentGraph);
 		}
 
