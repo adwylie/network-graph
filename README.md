@@ -26,6 +26,6 @@ A vertex/node is given an x position and y position in the plane, along with a n
 
 The user interface allows for either an omnidirectional or directional network to be drawn, with respect to certain specified parameters. All of the input graph, the intermediate minimum spanning tree, and oriented graphs wherein all sensors have either an identical range, or individual ranges can be selected to be examined. Additional controls exist to view the shortest path from any vertex to another, along with controls to manually set the sensor ranges when viewing an oriented graph with identical sensor range. For each graph, statistics are also shown.
 
-# Setup
+## Setup
 
 The Java Runtime Environment is required (1.6 or higher). After this is done, the program can be executed either by cloning the repository and building from source, or by grabbing the newest version available on the project's downloads page. The version in the downloads page includes a sample input graph, and generated Javadoc documentation for the code.
